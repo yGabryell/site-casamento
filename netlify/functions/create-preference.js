@@ -30,8 +30,11 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Token de Acesso do Mercado Pago configurado nas variáveis de ambiente do Netlify
-  const accessToken = process.env.MP_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  // Token de Acesso do Mercado Pago configurado nas variáveis de ambiente do Netlify ou token de produção dos noivos
+  const accessToken =
+    process.env.MP_ACCESS_TOKEN ||
+    process.env.MERCADO_PAGO_ACCESS_TOKEN ||
+    "APP_USR-4886951032560827-090416-0a3fe71b92203582c68fb30b49df9540-474353646";
 
   if (!accessToken || !accessToken.trim()) {
     return {
