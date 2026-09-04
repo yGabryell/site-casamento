@@ -130,6 +130,7 @@ async function init() {
     bindEvents();
     startCountdown();
     setupRevealAnimations();
+    checkMercadoPagoReturn();
   } catch (error) {
     handleInitError(error);
   }
@@ -171,6 +172,9 @@ function cacheElements() {
 
   el.copyPixBtn = document.getElementById("copyPixBtn");
   el.pixKeyText = document.getElementById("pixKeyText");
+  el.mpPayBtn = document.getElementById("mpPayBtn");
+  el.mpPayBtnText = document.getElementById("mpPayBtnText");
+  el.mpPayBtnSpinner = document.getElementById("mpPayBtnSpinner");
 
   el.searchInput = document.getElementById("searchInput");
   el.priceFilter = document.getElementById("priceFilter");
@@ -1313,6 +1317,10 @@ function bindGiftEvents() {
 }
 
 function bindPurchaseEvents() {
+  if (el.mpPayBtn) {
+    el.mpPayBtn.addEventListener("click", handleMercadoPagoCheckout);
+  }
+
   if (el.submitReceiptBtn) {
     el.submitReceiptBtn.addEventListener("click", handlePurchaseSubmission);
   }
@@ -1720,9 +1728,13 @@ function openPurchaseModal(itemId) {
   el.purchaseGuestName.value = readStoredGuestName();
   el.modalTitle.textContent = `Presentear: ${item.nome}`;
   el.modalText.hidden = false;
-  el.modalText.textContent = `Abra o pagamento de ${item.nome} e, quando finalizar, confirme a compra para os noivos validarem o item.`;
-  el.externalLink.href = item.links.external || CONFIG.defaultLinks.externalStore;
-  el.externalLink.textContent = `1. Abrir link de pagamento (${formatCurrency(item.preco)})`;
+  el.modalText.textContent = `Escolha pagar no cartão parcelado em até 12x via Mercado Pago ou diretamente por Pix.`;
+  if (el.mpPayBtnText) {
+    el.mpPayBtnText.textContent = `Pagar no Cartão (${formatCurrency(item.preco)})`;
+  }
+  if (el.externalLink) {
+    el.externalLink.href = item.links.external || CONFIG.defaultLinks.externalStore;
+  }
   showPage("presentes", { updateHash: true, resetScroll: false });
   if (el.purchaseGuestName) {
     window.setTimeout(() => el.purchaseGuestName.focus(), 220);
@@ -1732,6 +1744,7 @@ function openPurchaseModal(itemId) {
 function closePurchaseModal() {
   state.activePurchaseItemId = null;
   resetPurchaseForm(true, false);
+  setMpPayLoading(false);
   if (el.modalTitle) {
     el.modalTitle.textContent = "Presentear";
   }
@@ -1745,6 +1758,7 @@ function resetPurchaseForm(clearName, showFlow) {
   const shouldShowFlow = Boolean(showFlow);
   state.purchaseSubmitBusy = false;
   updatePurchaseSubmitState();
+  setMpPayLoading(false);
   setPurchaseFeedback("");
   if (el.purchaseFlow) {
     el.purchaseFlow.hidden = !shouldShowFlow;
@@ -1850,13 +1864,169 @@ async function handlePurchaseSubmission() {
 function updatePurchaseSubmitState() {
   if (!el.submitReceiptBtn) return;
   el.submitReceiptBtn.disabled = state.purchaseSubmitBusy;
-  el.submitReceiptBtn.textContent = state.purchaseSubmitBusy ? "Confirmando compra..." : "2. Confirmar compra";
+  el.submitReceiptBtn.textContent = state.purchaseSubmitBusy ? "Confirmando..." : "Confirmar que enviei o Pix";
 }
 
 function setPurchaseFeedback(message, isError) {
   if (!el.purchaseFeedback) return;
   el.purchaseFeedback.textContent = message || "";
   el.purchaseFeedback.dataset.state = isError ? "error" : "info";
+}
+
+async function handleMercadoPagoCheckout() {
+  const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
+  if (!item) {
+    setPurchaseFeedback("Não foi possível localizar o item selecionado.", true);
+    return;
+  }
+
+  if (item.status === "pending" || item.status === "purchased") {
+    setPurchaseFeedback("Este item não está mais disponível para confirmação.", true);
+    renderGiftList();
+    return;
+  }
+
+  const guestName = (el.purchaseGuestName ? el.purchaseGuestName.value : "").trim();
+  if (!guestName) {
+    setPurchaseFeedback("Por favor, digite seu nome acima para identificar o presente.", true);
+    if (el.purchaseGuestName) {
+      el.purchaseGuestName.focus();
+    }
+    return;
+  }
+
+  persistGuestNameValue(guestName);
+
+  setMpPayLoading(true);
+  setPurchaseFeedback("");
+
+  try {
+    const response = await fetch("/.netlify/functions/create-preference", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId: item.id,
+        itemName: item.nome,
+        itemPrice: item.preco,
+        itemImage: item.imagem,
+        guestName,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (data.error === "token_missing") {
+        setPurchaseFeedback(
+          "O pagamento com cartão via Mercado Pago está aguardando a configuração da chave MP_ACCESS_TOKEN no Netlify pelos noivos. Você pode presentear via Pix direto com 0% de taxas!",
+          true
+        );
+      } else {
+        setPurchaseFeedback(
+          data.message || "Não foi possível gerar a tela de pagamento. Tente novamente ou use o Pix direto.",
+          true
+        );
+      }
+      setMpPayLoading(false);
+      return;
+    }
+
+    if (data.init_point) {
+      setPurchaseFeedback("Redirecionando para o ambiente seguro do Mercado Pago...");
+
+      // Pré-registrar como pendente caso a conexão feche durante o checkout
+      try {
+        if (state.backendMode === "supabase") {
+          await state.backend.submitPurchaseRequest(item, guestName);
+        } else {
+          const request = {
+            id: createRequestId(),
+            itemId: item.id,
+            itemName: item.nome,
+            guestName,
+            submittedAt: new Date().toISOString(),
+          };
+          state.purchaseRequests = state.purchaseRequests.filter((entry) => entry.itemId !== item.id);
+          state.purchaseRequests.unshift(request);
+          item.status = "pending";
+          item.reservedBy = guestName;
+          persistPurchaseRequests();
+          persistItemStatuses();
+        }
+      } catch (err) {
+        console.warn("Erro ao pré-registrar:", err);
+      }
+
+      // Redireciona o convidado para o checkout oficial do Mercado Pago
+      window.location.href = data.init_point;
+    } else {
+      throw new Error("Link de pagamento não retornado.");
+    }
+  } catch (err) {
+    console.error("Erro ao chamar create-preference:", err);
+    setPurchaseFeedback("Erro de conexão ao gerar o pagamento. Por favor, tente novamente ou use o Pix.", true);
+    setMpPayLoading(false);
+  }
+}
+
+function setMpPayLoading(loading) {
+  if (!el.mpPayBtn) return;
+  el.mpPayBtn.disabled = loading;
+  if (el.mpPayBtnSpinner) {
+    el.mpPayBtnSpinner.hidden = !loading;
+  }
+  if (el.mpPayBtnText) {
+    const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
+    const priceText = item ? ` (${formatCurrency(item.preco)})` : "";
+    el.mpPayBtnText.textContent = loading ? "Gerando pagamento seguro..." : `Pagar no Cartão via Mercado Pago${priceText}`;
+  }
+}
+
+function checkMercadoPagoReturn() {
+  try {
+    const url = new URL(window.location.href);
+    const status = url.searchParams.get("status") || url.searchParams.get("collection_status");
+    const itemIdParam = url.searchParams.get("item_id");
+    const guestParam = url.searchParams.get("guest");
+
+    if (!status) return;
+
+    if (status === "approved") {
+      const foundId = Number(itemIdParam);
+      const item = state.items.find((entry) => entry.id === foundId);
+      const guestName = guestParam || (item ? item.reservedBy : "Convidado");
+
+      if (item) {
+        item.status = "purchased";
+        if (guestName) item.reservedBy = guestName;
+        persistItemStatuses();
+        renderGiftList();
+      }
+
+      showToast(`🎉 Pagamento aprovado! Muito obrigado pelo carinho${guestName ? ", " + guestName : ""}!`);
+
+      if (el.purchaseSuccess) {
+        showPage("presentes", { updateHash: true, resetScroll: false });
+        showPurchaseSuccess(item ? item.nome : "Presente", guestName);
+        if (el.purchaseSuccessMessage) {
+          el.purchaseSuccessMessage.textContent = `Seu presente ${item ? `(${item.nome})` : ""} foi confirmado com sucesso pelo Mercado Pago! Erica e Gabriel agradecem de todo coração pelo gesto de amor.`;
+        }
+      }
+
+      // Limpar parâmetros da URL de forma elegante
+      window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
+    } else if (status === "pending") {
+      showToast("Seu pagamento está sendo processado pelo Mercado Pago. Assim que compensar, os noivos serão notificados!");
+      window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
+    } else if (status === "failure") {
+      showToast("O pagamento no Mercado Pago não foi concluído. Você pode tentar novamente ou utilizar o Pix direto.");
+      window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
+    }
+  } catch (err) {
+    console.warn("Erro ao processar retorno do Mercado Pago:", err);
+  }
 }
 
 async function openAdminModal() {

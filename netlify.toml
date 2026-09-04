@@ -1,6 +1,7 @@
 # Configuração de Publicação Automática no Netlify
 [build]
   publish = "."
+  functions = "netlify/functions"
 
 # Cabeçalhos de segurança e cache otimizado
 [[headers]]
