@@ -1740,9 +1740,9 @@ function openPurchaseModal(itemId) {
   el.purchaseGuestName.value = readStoredGuestName();
   el.modalTitle.textContent = `Presentear: ${item.nome}`;
   el.modalText.hidden = false;
-  el.modalText.textContent = `Escolha pagar via Mercado Pago (Pix automático ou Cartão em até 12x) ou faça o Pix direto com a chave dos noivos.`;
+  el.modalText.textContent = `Escolha como prefere presentear: Pix ou Cartão de Crédito/Débito.`;
   if (el.mpPixBtnText) {
-    el.mpPixBtnText.textContent = `Pagar no Pix via Mercado Pago (${formatCurrency(item.preco)})`;
+    el.mpPixBtnText.textContent = `Pagar no Pix (${formatCurrency(item.preco)})`;
   }
   if (el.mpCardBtnText) {
     el.mpCardBtnText.textContent = `Pagar no Cartão (${formatCurrency(item.preco)})`;
@@ -1938,12 +1938,12 @@ async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
     if (!response.ok) {
       if (data.error === "token_missing") {
         setPurchaseFeedback(
-          "O pagamento via Mercado Pago está aguardando a configuração da chave MP_ACCESS_TOKEN no Netlify pelos noivos. Você pode presentear via Pix direto com 0% de taxas!",
+          "O pagamento online está temporariamente indisponível. Por favor, tente novamente mais tarde.",
           true
         );
       } else {
         setPurchaseFeedback(
-          data.message || "Não foi possível gerar a tela de pagamento. Tente novamente ou use o Pix direto.",
+          data.message || "Não foi possível gerar a tela de pagamento. Tente novamente.",
           true
         );
       }
@@ -1954,8 +1954,8 @@ async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
     if (data.init_point) {
       setPurchaseFeedback(
         paymentMethod === "pix"
-          ? "Abrindo pagamento Pix seguro no Mercado Pago..."
-          : "Redirecionando para o ambiente seguro do Mercado Pago..."
+          ? "Abrindo pagamento Pix seguro..."
+          : "Redirecionando para o ambiente seguro de pagamento..."
       );
 
       // Pré-registrar como pendente caso a conexão feche durante o checkout
@@ -1988,7 +1988,7 @@ async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
     }
   } catch (err) {
     console.error("Erro ao chamar create-preference:", err);
-    setPurchaseFeedback("Erro de conexão ao gerar o pagamento. Por favor, tente novamente ou use o Pix.", true);
+    setPurchaseFeedback("Erro de conexão ao gerar o pagamento. Por favor, tente novamente.", true);
     setMpPayLoading(false);
   }
 }
@@ -1997,7 +1997,7 @@ function setMpPayLoading(loading, activeMethod = null) {
   const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
   const priceText = item ? ` (${formatCurrency(item.preco)})` : "";
 
-  // Botão Pix Mercado Pago
+  // Botão Pix
   if (el.mpPixBtn) {
     el.mpPixBtn.disabled = loading;
     if (el.mpPixBtnSpinner) {
@@ -2006,8 +2006,8 @@ function setMpPayLoading(loading, activeMethod = null) {
     if (el.mpPixBtnText) {
       el.mpPixBtnText.textContent =
         loading && activeMethod === "pix"
-          ? "Gerando Pix Mercado Pago..."
-          : `Pagar no Pix via Mercado Pago${priceText}`;
+          ? "Gerando Pix..."
+          : `Pagar no Pix${priceText}`;
     }
   }
 
@@ -2057,17 +2057,17 @@ function checkMercadoPagoReturn() {
         showPage("presentes", { updateHash: true, resetScroll: false });
         showPurchaseSuccess(item ? item.nome : "Presente", guestName);
         if (el.purchaseSuccessMessage) {
-          el.purchaseSuccessMessage.textContent = `Seu presente ${item ? `(${item.nome})` : ""} foi confirmado com sucesso pelo Mercado Pago! Erica e Gabriel agradecem de todo coração pelo gesto de amor.`;
+          el.purchaseSuccessMessage.textContent = `Seu presente ${item ? `(${item.nome})` : ""} foi confirmado com sucesso! Erica e Gabriel agradecem de todo coração pelo gesto de amor.`;
         }
       }
 
       // Limpar parâmetros da URL de forma elegante
       window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
     } else if (status === "pending") {
-      showToast("Seu pagamento está sendo processado pelo Mercado Pago. Assim que compensar, os noivos serão notificados!");
+      showToast("Seu pagamento está sendo processado. Assim que compensar, os noivos serão notificados!");
       window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
     } else if (status === "failure") {
-      showToast("O pagamento no Mercado Pago não foi concluído. Você pode tentar novamente ou utilizar o Pix direto.");
+      showToast("O pagamento não foi concluído. Você pode tentar novamente.");
       window.history.replaceState({}, document.title, window.location.pathname + "#presentes");
     }
   } catch (err) {
