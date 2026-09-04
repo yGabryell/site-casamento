@@ -11,4 +11,6 @@ desktop.ini
 
 # Editores
 .vscode/
-.idea/
+# Pastas de trabalho temporarias
+assets/itens/
+scratch/

@@ -51,7 +51,7 @@ const GIFT_COLLECTIONS = {
   },
 };
 
-const GIFTS_PER_PAGE = 6;
+const GIFTS_PER_PAGE = 12;
 
 const STORAGE_KEYS = {
   guestName: "wedding_guest_name",
@@ -1305,6 +1305,9 @@ function bindGiftEvents() {
       if (!Number.isFinite(nextPage)) return;
       state.giftPages[state.giftCategory] = nextPage;
       renderGiftList();
+      if (el.giftList) {
+        el.giftList.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     });
   }
 }

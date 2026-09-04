@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=20270501v3">
+  <link rel="stylesheet" href="styles.css?v=casar2col2027">
 </head>
 <body>
   <a class="skip-link" href="#inicio">Pular para o conteúdo</a>
@@ -355,6 +355,26 @@
         <div class="presentes-intro__ornament" aria-hidden="true"></div>
       </article>
 
+      <!-- Filtro e Busca da Lista de Presentes -->
+      <div class="gift-filter-bar" id="giftFilterBar">
+        <div class="gift-filter-search">
+          <svg class="gift-filter-search__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input class="gift-filter-search__input" id="searchInput" type="search" placeholder="Buscar presente ou item..." autocomplete="off">
+        </div>
+        <div class="gift-filter-select-wrap">
+          <select class="gift-filter-select" id="priceFilter" aria-label="Filtrar por valor">
+            <option value="all">Todos os valores</option>
+            <option value="0-150">Até R$ 150</option>
+            <option value="151-300">R$ 151 a R$ 300</option>
+            <option value="301-600">R$ 301 a R$ 600</option>
+            <option value="601+">Acima de R$ 600</option>
+          </select>
+        </div>
+      </div>
+
       <div class="gift-grid" id="giftList" aria-live="polite"></div>
       <nav class="gift-pagination" id="giftPagination" aria-label="Paginação dos presentes" hidden></nav>
       <p class="empty-state" id="giftEmptyState" hidden>Nenhum presente disponível no momento.</p>
@@ -609,9 +629,9 @@
     <p class="noscript" style="text-align: center; padding: 1rem; background: #fff;">Ative o JavaScript para aproveitar todas as funcionalidades do site.</p>
   </noscript>
 
-  <script src="data/lua-de-mel.js?v=20270501v3"></script>
-  <script src="data/presentes-virtuais.js?v=20270501v3"></script>
-  <script src="data/items.js?v=20270501v3"></script>
-  <script src="script.js?v=20270501v3"></script>
+  <script src="data/lua-de-mel.js?v=casar2col2027"></script>
+  <script src="data/presentes-virtuais.js?v=casar2col2027"></script>
+  <script src="data/items.js?v=casar2col2027"></script>
+  <script src="script.js?v=casar2col2027"></script>
 </body>
 </html>
