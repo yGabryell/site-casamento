@@ -1,14 +1,13 @@
 /*
-  Itens da Lista de casamento virtual.
-  Troque imagens em assets/items/item1.jpg, item2.jpg...
+  Itens da Lista de casamento virtual (Lista de Casa).
 */
 window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 1,
     category: "registry",
-    nome: "Aparelho de fondue inox - 25 pecas",
-    descricao: "Conjunto completo para noites especiais.",
-    preco: 571.67,
+    nome: "Kit de temperos & potes de cozinha",
+    descricao: "Conjunto de potes herméticos e temperos para dar aquele sabor especial ao novo lar.",
+    preco: 40.0,
     imagem: "assets/items/item1.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -18,9 +17,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 2,
     category: "registry",
-    nome: "Aparelho de jantar com detalhes dourados",
-    descricao: "Servico elegante para receber convidados.",
-    preco: 692.24,
+    nome: "Jogo de copos para brindar o amor",
+    descricao: "Copos e taças elegantes para receber amigos e família com muito carinho.",
+    preco: 55.0,
     imagem: "assets/items/item2.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -30,9 +29,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 3,
     category: "registry",
-    nome: "Aparelho de jantar completo - 42 pecas",
-    descricao: "Kit completo para as refeicoes do novo lar.",
-    preco: 623.64,
+    nome: "Formas & refratários de vidro",
+    descricao: "Conjunto de assadeiras e refratários para os bolos e assados deliciosos de domingo.",
+    preco: 65.0,
     imagem: "assets/items/item3.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -42,9 +41,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 4,
     category: "registry",
-    nome: "Aparelho de sopa - 5 pecas",
-    descricao: "Conjunto para servir sopas com estilo.",
-    preco: 218.27,
+    nome: "Jogo de toalhas macias de banho",
+    descricao: "Toalhas 100% algodão super macias e fofinhas para o conforto do dia a dia.",
+    preco: 85.0,
     imagem: "assets/items/item4.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -54,9 +53,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 5,
     category: "registry",
-    nome: "Aquecedor eletrico",
-    descricao: "Mais conforto termico para o dia a dia.",
-    preco: 187.09,
+    nome: "Sanduicheira para o café rápido",
+    descricao: "Praticidade e rapidez para lanches e torradas quentinhas a dois.",
+    preco: 95.0,
     imagem: "assets/items/item5.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -66,9 +65,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 6,
     category: "registry",
-    nome: "Ar-condicionado portatil - 12000 BTUs",
-    descricao: "Climatizacao eficiente para os ambientes.",
-    preco: 1766.97,
+    nome: "Liquidificador potente para sucos",
+    descricao: "Para vitaminas, sucos naturais e receitas especiais no dia a dia do casal.",
+    preco: 115.0,
     imagem: "assets/items/item6.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -78,9 +77,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 7,
     category: "registry",
-    nome: "Aspirador de po e agua",
-    descricao: "Limpeza versatil para casa toda.",
-    preco: 280.64,
+    nome: "Cafeteira elétrica para manhãs felizes",
+    descricao: "Café fresco e cheiroso para começar as manhãs com muita energia e amor.",
+    preco: 125.0,
     imagem: "assets/items/item7.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -90,9 +89,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 8,
     category: "registry",
-    nome: "Bandeja",
-    descricao: "Peca decorativa e funcional para servir.",
-    preco: 616.36,
+    nome: "Jogo de lençóis confortáveis",
+    descricao: "Jogo de cama macio e aconchegante para noites de sono tranquilas.",
+    preco: 150.0,
     imagem: "assets/items/item8.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -102,9 +101,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 9,
     category: "registry",
-    nome: "Bandejas para servir em inox - 8 pecas",
-    descricao: "Conjunto em inox para servir com praticidade.",
-    preco: 249.45,
+    nome: "Conjunto de panelas antiaderentes",
+    descricao: "Kit essencial de panelas antiaderentes para preparar jantares especiais a dois.",
+    preco: 175.0,
     imagem: "assets/items/item9.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -114,9 +113,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 10,
     category: "registry",
-    nome: "Banho e massagem relaxante",
-    descricao: "Experiencia de bem-estar para recarregar.",
-    preco: 285.83,
+    nome: "Ferro a vapor para roupas impecáveis",
+    descricao: "Ferro a vapor moderno para cuidar das roupas do casal com rapidez e facilidade.",
+    preco: 185.0,
     imagem: "assets/items/item10.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -126,9 +125,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 11,
     category: "registry",
-    nome: "Batedeira 10 velocidades",
-    descricao: "Alta potencia para massas e sobremesas.",
-    preco: 1999.79,
+    nome: "Air Fryer para receitas práticas",
+    descricao: "O item mais amado da cozinha moderna para refeições rápidas, crocantes e saudáveis.",
+    preco: 220.0,
     imagem: "assets/items/item11.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
@@ -138,9 +137,9 @@ window.WEDDING_REGISTRY_ITEMS = [
   {
     id: 12,
     category: "registry",
-    nome: "Batedeira planetaria 8 velocidades",
-    descricao: "Modelo planetario para receitas especiais.",
-    preco: 415.76,
+    nome: "Aspirador de pó leve e potente",
+    descricao: "Para manter o novo lar sempre impecável e limpinho com o máximo de praticidade.",
+    preco: 260.0,
     imagem: "assets/items/item12.jpg",
     links: {
       external: "https://www.mercadolivre.com.br/",
