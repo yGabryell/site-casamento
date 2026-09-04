@@ -1,0 +1,14 @@
+# Arquivos e pastas de backup locais
+**/backup/
+**/backup_placeholders/
+*_original.*
+test_tmp.txt
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/

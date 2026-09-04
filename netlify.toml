@@ -1,0 +1,28 @@
+# Configuração de Publicação Automática no Netlify
+[build]
+  publish = "."
+
+# Cabeçalhos de segurança e cache otimizado
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache de longa duração para imagens e fontes (carregamento ultra-rápido)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Garantir que o index.html e os scripts sempre carreguem a versão mais recente
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
