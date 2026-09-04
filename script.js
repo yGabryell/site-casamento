@@ -8,7 +8,7 @@ const CONFIG = {
   coupleNames: "Erica e Gabriel",
   weddingDate: "2027-05-01T16:00:00",
   city: "Chã do Pilar - AL",
-  eventAddress: "Armazém Pilar - Chã do Pilar",
+  eventAddress: "Casa Berlins - Chã do Pilar",
   eventTime: "Recepção 16h | Cerimônia 17h",
   // Troque por um PIN seu para proteger o reset administrativo.
   adminPin: "EG01052027",
@@ -18,7 +18,7 @@ const CONFIG = {
   pixTitular: "Erica & Gabriel",
   defaultLinks: {
     externalStore: "https://www.mercadolivre.com.br/",
-    maps: "https://maps.app.goo.gl/H2cuJ6s9XrbtSvSY8",
+    maps: "https://www.google.com/maps/search/?api=1&query=Casa+Berlins+Pilar+AL",
   },
   backend: {
     provider: "supabase", // "local" | "supabase"
@@ -2397,11 +2397,8 @@ function buildWhatsAppLink(message) {
 }
 
 function buildMapsEmbedUrl() {
-  const queryParts = [CONFIG.eventAddress, CONFIG.city]
-    .map((value) => String(value || "").trim())
-    .filter(Boolean);
-  const query = queryParts.join(", ");
-  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
+  const query = "Casa Berlins, Pilar - AL";
+  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=17&output=embed`;
 }
 
 function buildCoupleInitials(names) {
