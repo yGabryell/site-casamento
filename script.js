@@ -5,7 +5,7 @@
   Observação: sem backend, status e compras pendentes ficam salvos apenas neste navegador.
 */
 const CONFIG = {
-  coupleNames: "Erica e Gabriel",
+  coupleNames: "Erica & Gabriel",
   weddingDate: "2027-05-01T16:00:00",
   city: "Chã do Pilar - AL",
   eventAddress: "Casa Berlins - Chã do Pilar",
@@ -2405,7 +2405,7 @@ function buildCoupleInitials(names) {
   const chunks = String(names || "")
     .split(/\s+/)
     .map((part) => part.trim())
-    .filter((part) => part && part.toLowerCase() !== "e");
+    .filter((part) => part && part.toLowerCase() !== "e" && part !== "&");
   if (!chunks.length) return "C & C";
   const first = chunks[0].charAt(0).toUpperCase();
   const second = (chunks[1] || chunks[chunks.length - 1]).charAt(0).toUpperCase();
