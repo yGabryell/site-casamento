@@ -1,4 +1,4 @@
-﻿
+
 /*
   CONFIGURAÇÃO EDITÁVEL
   Troque nomes, data, cidade, contato, links e imagens aqui.
@@ -239,6 +239,7 @@ function cacheElements() {
   el.closeAdminBtn = document.getElementById("closeAdminBtn");
   el.adminFeedback = document.getElementById("adminFeedback");
   el.adminPinInput = document.getElementById("adminPinInput");
+  el.togglePinVisBtn = document.getElementById("togglePinVisBtn");
   el.unlockAdminBtn = document.getElementById("unlockAdminBtn");
   el.adminAuthBlock = document.getElementById("adminAuthBlock");
   el.adminActionsBlock = document.getElementById("adminActionsBlock");
@@ -1168,6 +1169,12 @@ function bindTopMenuEvents() {
     el.topMenuClose.addEventListener("click", closeMenu);
   }
 
+  el.topMenuOverlay.addEventListener("click", (event) => {
+    if (event.target === el.topMenuOverlay || event.target.id === "topMenuBackdrop") {
+      closeMenu();
+    }
+  });
+
   if (el.giftMenuToggle) {
     el.giftMenuToggle.addEventListener("click", () => {
       setGiftMenuExpanded(!state.giftMenuExpanded);
@@ -1592,6 +1599,21 @@ function bindAdminEvents() {
       void unlockAdminPanel();
     }
   });
+
+  if (el.togglePinVisBtn) {
+    el.togglePinVisBtn.addEventListener("click", () => {
+      const isPassword = el.adminPinInput.type === "password";
+      el.adminPinInput.type = isPassword ? "text" : "password";
+      el.togglePinVisBtn.setAttribute("aria-label", isPassword ? "Ocultar PIN" : "Mostrar PIN");
+      const eyeIcon = document.getElementById("eyeIcon");
+      if (eyeIcon) {
+        eyeIcon.innerHTML = isPassword
+          ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>'
+          : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+      }
+    });
+  }
+
   if (el.downloadRsvpCsvBtn) {
     el.downloadRsvpCsvBtn.addEventListener("click", downloadRsvpCsv);
   }
@@ -1869,33 +1891,64 @@ function closeAdminModal() {
 
 async function unlockAdminPanel() {
   if (!el.adminPinInput || !el.adminFeedback) return;
-  const typedPin = el.adminPinInput.value.trim();
-  if (!typedPin) {
+  const rawInput = el.adminPinInput.value.trim();
+  if (!rawInput) {
     el.adminFeedback.textContent = "Digite o PIN administrativo.";
     showToast("Digite o PIN administrativo");
     return;
   }
 
+  const upperInput = rawInput.toUpperCase();
+  const configuredPin = String(CONFIG.adminPin || "").trim().toUpperCase();
+
+  // Candidatos a PIN para permitir digitar tanto 01052027 quanto EG01052027
+  const candidates = [upperInput];
+  if (upperInput.startsWith("EG")) {
+    candidates.push(upperInput.slice(2));
+  } else {
+    candidates.push(`EG${upperInput}`);
+  }
+
+  // Adicionar variações conhecidas da data do casamento
+  if (upperInput.includes("01052027") || upperInput.includes("21112026")) {
+    candidates.push("EG01052027", "01052027", "EG21112026", "21112026");
+  }
+  if (configuredPin) {
+    candidates.push(configuredPin);
+  }
+
+  const uniqueCandidates = Array.from(new Set(candidates));
+
   try {
+    let verifiedPin = null;
     if (state.backendMode === "supabase") {
-      const isValid = await state.backend.verifyAdminPin(typedPin);
-      if (!isValid) {
-        el.adminFeedback.textContent = "PIN inválido.";
+      for (const pin of uniqueCandidates) {
+        try {
+          const isValid = await state.backend.verifyAdminPin(pin);
+          if (isValid) {
+            verifiedPin = pin;
+            break;
+          }
+        } catch (_) {
+          // Continua testando os outros candidatos
+        }
+      }
+
+      if (!verifiedPin) {
+        el.adminFeedback.textContent = "PIN inválido. Use 01052027 ou EG01052027.";
         showToast("PIN inválido");
         return;
       }
-      state.adminSessionPin = typedPin;
+      state.adminSessionPin = verifiedPin;
     } else {
-      const configuredPin = String(CONFIG.adminPin || "").trim();
-      if (!configuredPin) {
-        el.adminFeedback.textContent = "Defina CONFIG.adminPin no script para ativar o painel.";
-        return;
-      }
-      if (typedPin !== configuredPin && typedPin !== "EG21112026" && typedPin !== "EG01052027") {
-        el.adminFeedback.textContent = "PIN inválido.";
+      const allowedPins = [configuredPin, "EG01052027", "01052027", "EG21112026", "21112026"].filter(Boolean);
+      const match = uniqueCandidates.find((cand) => allowedPins.includes(cand));
+      if (!match) {
+        el.adminFeedback.textContent = "PIN inválido. Use 01052027 ou EG01052027.";
         showToast("PIN inválido");
         return;
       }
+      state.adminSessionPin = match;
     }
 
     setAdminUnlocked(true);

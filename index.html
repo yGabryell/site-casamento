@@ -84,29 +84,51 @@
     </div>
   </header>
 
-  <!-- Menu Overlay Lateral (Mobile Drawer) -->
+  <!-- Menu Overlay Lateral (Mobile Drawer de Alto Luxo) -->
   <aside class="menu-overlay" id="topMenuOverlay" hidden>
-    <div class="menu-overlay__header">
-      <span class="menu-overlay__brand" id="menuOverlayBrand">E &amp; G</span>
-      <button class="menu-overlay__close" id="topMenuClose" type="button" aria-label="Fechar menu">&times;</button>
-    </div>
-    <nav class="menu-overlay__list">
-      <a class="menu-overlay__item is-active" data-nav href="#inicio">Início</a>
-      <div class="menu-overlay__group">
-        <button class="menu-overlay__item menu-overlay__item--toggle" id="giftMenuToggle" type="button" aria-expanded="false" aria-controls="giftMenuPanel">
-          <span>Presentes</span>
-          <span class="menu-overlay__chevron" aria-hidden="true"></span>
-        </button>
-        <div class="menu-overlay__submenu" id="giftMenuPanel" hidden>
-          <a class="menu-overlay__subitem" data-nav data-gift-category-tab="honeymoon" href="#presentes">Lua de mel</a>
-          <a class="menu-overlay__subitem" data-nav data-gift-category-tab="registry" href="#presentes">Lista de presentes virtuais</a>
+    <div class="menu-overlay__backdrop" id="topMenuBackdrop"></div>
+    <div class="menu-overlay__panel">
+      <div class="menu-overlay__header">
+        <div class="menu-overlay__brand-wrap">
+          <span class="menu-overlay__brand" id="menuOverlayBrand">E &amp; G</span>
+          <span class="menu-overlay__tagline">01 de Maio de 2027</span>
         </div>
+        <button class="menu-overlay__close" id="topMenuClose" type="button" aria-label="Fechar menu">&times;</button>
       </div>
-      <a class="menu-overlay__item" data-nav href="#confirmacao">Confirmar presença</a>
-      <a class="menu-overlay__item" data-nav href="#mensagens">Mensagens aos noivos</a>
-      <a class="menu-overlay__item" data-nav href="#informacoes">Informações &amp; Traje</a>
-      <a class="menu-overlay__item" data-nav href="#administrativo">Área administrativa</a>
-    </nav>
+      <nav class="menu-overlay__list">
+        <a class="menu-overlay__item is-active" data-nav href="#inicio">
+          <span>Início</span>
+        </a>
+        <div class="menu-overlay__group">
+          <button class="menu-overlay__item menu-overlay__item--toggle" id="giftMenuToggle" type="button" aria-expanded="false" aria-controls="giftMenuPanel">
+            <span>Presentes</span>
+            <span class="menu-overlay__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="menu-overlay__submenu" id="giftMenuPanel" hidden>
+            <a class="menu-overlay__subitem" data-nav data-gift-category-tab="honeymoon" href="#presentes">Lua de mel</a>
+            <a class="menu-overlay__subitem" data-nav data-gift-category-tab="registry" href="#presentes">Lista de presentes virtuais</a>
+          </div>
+        </div>
+        <a class="menu-overlay__item" data-nav href="#confirmacao">
+          <span>Confirmar presença</span>
+          <span class="menu-overlay__badge">RSVP</span>
+        </a>
+        <a class="menu-overlay__item" data-nav href="#mensagens">
+          <span>Mensagens aos noivos</span>
+        </a>
+        <a class="menu-overlay__item" data-nav href="#informacoes">
+          <span>Informações &amp; Traje</span>
+        </a>
+        <a class="menu-overlay__item menu-overlay__item--admin" data-nav href="#administrativo">
+          <span>Área administrativa</span>
+          <span class="menu-overlay__admin-tag">Noivos</span>
+        </a>
+      </nav>
+      <div class="menu-overlay__footer">
+        <p class="menu-overlay__footer-names">Erica &amp; Gabriel</p>
+        <p class="menu-overlay__footer-location">Chã do Pilar - AL</p>
+      </div>
+    </div>
   </aside>
 
   <main>
@@ -487,7 +509,13 @@
 
       <div id="adminAuthBlock">
         <label class="admin-label" for="adminPinInput">Digite o PIN administrativo</label>
-        <input class="admin-input" id="adminPinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="Digite seu PIN">
+        <div style="position: relative; margin-bottom: 0.6rem;">
+          <input class="admin-input" id="adminPinInput" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="Ex: 01052027 ou EG01052027" style="padding-right: 48px; text-transform: uppercase; margin-bottom: 0;">
+          <button type="button" id="togglePinVisBtn" aria-label="Mostrar ou ocultar PIN" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; display: flex; align-items: center;">
+            <svg id="eyeIcon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <p style="font-size: 0.84rem; color: var(--muted); margin-bottom: 1.2rem;">Dica: você pode usar <strong>01052027</strong> ou <strong>EG01052027</strong></p>
         <button class="btn btn--primary btn--block" id="unlockAdminBtn" type="button">Entrar no painel</button>
       </div>
 
