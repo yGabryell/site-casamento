@@ -16,7 +16,12 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Garantir que o index.html e os scripts sempre carreguem a versão mais recente
+# Garantir que o index.html, scripts e estilos sempre carreguem a versão mais recente
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 [[headers]]
   for = "/index.html"
   [headers.values]
@@ -24,5 +29,15 @@
 
 [[headers]]
   for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
