@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { itemId, itemName, itemPrice, itemImage, guestName } = body;
+    const { itemId, itemName, itemPrice, itemImage, guestName, paymentMethod } = body;
 
     if (!itemName || !itemPrice || Number(itemPrice) <= 0) {
       return {
@@ -77,7 +77,16 @@ exports.handler = async (event, context) => {
       id: Number(itemId) || 0,
       item: String(itemName).slice(0, 60),
       guest: String(guestName || "Convidado").slice(0, 50),
+      method: String(paymentMethod || "all"),
     });
+
+    const paymentMethodsConfig = {
+      installments: 12,
+    };
+
+    if (paymentMethod === "pix") {
+      paymentMethodsConfig.default_payment_method_id = "pix";
+    }
 
     const preferencePayload = {
       items: [
@@ -103,9 +112,7 @@ exports.handler = async (event, context) => {
       auto_return: "approved",
       statement_descriptor: "CASAMENTO E&G",
       external_reference: externalRef,
-      payment_methods: {
-        installments: 12,
-      },
+      payment_methods: paymentMethodsConfig,
     };
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {

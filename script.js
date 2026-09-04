@@ -172,9 +172,15 @@ function cacheElements() {
 
   el.copyPixBtn = document.getElementById("copyPixBtn");
   el.pixKeyText = document.getElementById("pixKeyText");
-  el.mpPayBtn = document.getElementById("mpPayBtn");
-  el.mpPayBtnText = document.getElementById("mpPayBtnText");
-  el.mpPayBtnSpinner = document.getElementById("mpPayBtnSpinner");
+  el.mpPixBtn = document.getElementById("mpPixBtn");
+  el.mpPixBtnText = document.getElementById("mpPixBtnText");
+  el.mpPixBtnSpinner = document.getElementById("mpPixBtnSpinner");
+  el.mpCardBtn = document.getElementById("mpCardBtn") || document.getElementById("mpPayBtn");
+  el.mpCardBtnText = document.getElementById("mpCardBtnText") || document.getElementById("mpPayBtnText");
+  el.mpCardBtnSpinner = document.getElementById("mpCardBtnSpinner") || document.getElementById("mpPayBtnSpinner");
+  el.mpPayBtn = el.mpCardBtn;
+  el.mpPayBtnText = el.mpCardBtnText;
+  el.mpPayBtnSpinner = el.mpCardBtnSpinner;
 
   el.searchInput = document.getElementById("searchInput");
   el.priceFilter = document.getElementById("priceFilter");
@@ -1317,8 +1323,14 @@ function bindGiftEvents() {
 }
 
 function bindPurchaseEvents() {
-  if (el.mpPayBtn) {
-    el.mpPayBtn.addEventListener("click", handleMercadoPagoCheckout);
+  if (el.mpPixBtn) {
+    el.mpPixBtn.addEventListener("click", () => handleMercadoPagoCheckout("pix"));
+  }
+
+  if (el.mpCardBtn) {
+    el.mpCardBtn.addEventListener("click", () => handleMercadoPagoCheckout("credit_card"));
+  } else if (el.mpPayBtn) {
+    el.mpPayBtn.addEventListener("click", () => handleMercadoPagoCheckout("credit_card"));
   }
 
   if (el.submitReceiptBtn) {
@@ -1728,8 +1740,13 @@ function openPurchaseModal(itemId) {
   el.purchaseGuestName.value = readStoredGuestName();
   el.modalTitle.textContent = `Presentear: ${item.nome}`;
   el.modalText.hidden = false;
-  el.modalText.textContent = `Escolha pagar no cartão parcelado em até 12x via Mercado Pago ou diretamente por Pix.`;
-  if (el.mpPayBtnText) {
+  el.modalText.textContent = `Escolha pagar via Mercado Pago (Pix automático ou Cartão em até 12x) ou faça o Pix direto com a chave dos noivos.`;
+  if (el.mpPixBtnText) {
+    el.mpPixBtnText.textContent = `Pagar no Pix via Mercado Pago (${formatCurrency(item.preco)})`;
+  }
+  if (el.mpCardBtnText) {
+    el.mpCardBtnText.textContent = `Pagar no Cartão (${formatCurrency(item.preco)})`;
+  } else if (el.mpPayBtnText) {
     el.mpPayBtnText.textContent = `Pagar no Cartão (${formatCurrency(item.preco)})`;
   }
   if (el.externalLink) {
@@ -1873,7 +1890,7 @@ function setPurchaseFeedback(message, isError) {
   el.purchaseFeedback.dataset.state = isError ? "error" : "info";
 }
 
-async function handleMercadoPagoCheckout() {
+async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
   const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
   if (!item) {
     setPurchaseFeedback("Não foi possível localizar o item selecionado.", true);
@@ -1897,7 +1914,7 @@ async function handleMercadoPagoCheckout() {
 
   persistGuestNameValue(guestName);
 
-  setMpPayLoading(true);
+  setMpPayLoading(true, paymentMethod);
   setPurchaseFeedback("");
 
   try {
@@ -1912,6 +1929,7 @@ async function handleMercadoPagoCheckout() {
         itemPrice: item.preco,
         itemImage: item.imagem,
         guestName,
+        paymentMethod,
       }),
     });
 
@@ -1920,7 +1938,7 @@ async function handleMercadoPagoCheckout() {
     if (!response.ok) {
       if (data.error === "token_missing") {
         setPurchaseFeedback(
-          "O pagamento com cartão via Mercado Pago está aguardando a configuração da chave MP_ACCESS_TOKEN no Netlify pelos noivos. Você pode presentear via Pix direto com 0% de taxas!",
+          "O pagamento via Mercado Pago está aguardando a configuração da chave MP_ACCESS_TOKEN no Netlify pelos noivos. Você pode presentear via Pix direto com 0% de taxas!",
           true
         );
       } else {
@@ -1934,7 +1952,11 @@ async function handleMercadoPagoCheckout() {
     }
 
     if (data.init_point) {
-      setPurchaseFeedback("Redirecionando para o ambiente seguro do Mercado Pago...");
+      setPurchaseFeedback(
+        paymentMethod === "pix"
+          ? "Abrindo pagamento Pix seguro no Mercado Pago..."
+          : "Redirecionando para o ambiente seguro do Mercado Pago..."
+      );
 
       // Pré-registrar como pendente caso a conexão feche durante o checkout
       try {
@@ -1971,16 +1993,40 @@ async function handleMercadoPagoCheckout() {
   }
 }
 
-function setMpPayLoading(loading) {
-  if (!el.mpPayBtn) return;
-  el.mpPayBtn.disabled = loading;
-  if (el.mpPayBtnSpinner) {
-    el.mpPayBtnSpinner.hidden = !loading;
+function setMpPayLoading(loading, activeMethod = null) {
+  const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
+  const priceText = item ? ` (${formatCurrency(item.preco)})` : "";
+
+  // Botão Pix Mercado Pago
+  if (el.mpPixBtn) {
+    el.mpPixBtn.disabled = loading;
+    if (el.mpPixBtnSpinner) {
+      el.mpPixBtnSpinner.hidden = !(loading && activeMethod === "pix");
+    }
+    if (el.mpPixBtnText) {
+      el.mpPixBtnText.textContent =
+        loading && activeMethod === "pix"
+          ? "Gerando Pix Mercado Pago..."
+          : `Pagar no Pix via Mercado Pago${priceText}`;
+    }
   }
-  if (el.mpPayBtnText) {
-    const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
-    const priceText = item ? ` (${formatCurrency(item.preco)})` : "";
-    el.mpPayBtnText.textContent = loading ? "Gerando pagamento seguro..." : `Pagar no Cartão via Mercado Pago${priceText}`;
+
+  // Botão Cartão Mercado Pago
+  const cardBtn = el.mpCardBtn || el.mpPayBtn;
+  const cardSpinner = el.mpCardBtnSpinner || el.mpPayBtnSpinner;
+  const cardText = el.mpCardBtnText || el.mpPayBtnText;
+
+  if (cardBtn) {
+    cardBtn.disabled = loading;
+    if (cardSpinner) {
+      cardSpinner.hidden = !(loading && activeMethod === "credit_card");
+    }
+    if (cardText) {
+      cardText.textContent =
+        loading && activeMethod === "credit_card"
+          ? "Gerando pagamento em até 12x..."
+          : `Pagar no Cartão (em até 12x)${priceText}`;
+    }
   }
 }
 

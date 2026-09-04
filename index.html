@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=mp2027v1">
+  <link rel="stylesheet" href="styles.css?v=mp2027v2">
 </head>
 <body>
   <a class="skip-link" href="#inicio">Pular para o conteúdo</a>
@@ -388,19 +388,30 @@
           <label class="admin-label" for="purchaseGuestName">Seu nome para identificar o presente *</label>
           <input class="admin-input" id="purchaseGuestName" type="text" maxlength="50" placeholder="Ex: Maria e Carlos Silva">
 
-          <!-- Opção 1: Cartão de Crédito / Mercado Pago -->
-          <div class="payment-method-card payment-method-card--card">
+          <!-- Opção 1: Mercado Pago (Cartão em até 12x ou Pix Automático) -->
+          <div class="payment-method-card payment-method-card--mp">
             <div class="payment-method-card__header">
               <span class="payment-method-card__title">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                Cartão de Crédito / Mercado Pago
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                Mercado Pago
               </span>
-              <span class="payment-method-card__badge">Em até 12x</span>
+              <div class="payment-method-card__badges">
+                <span class="payment-method-card__badge payment-method-card__badge--pix">Pix Automático</span>
+                <span class="payment-method-card__badge">Cartão até 12x</span>
+              </div>
             </div>
-            <p class="payment-method-card__desc">Pague com cartão de crédito parcelado, débito ou saldo Mercado Pago em ambiente 100% seguro.</p>
-            <button class="btn btn--mp-pay btn--block" id="mpPayBtn" type="button">
-              <span id="mpPayBtnText">Pagar no Cartão via Mercado Pago</span>
-              <span id="mpPayBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
+            <p class="payment-method-card__desc">Escolha como prefere pagar no ambiente oficial do Mercado Pago com baixa automática:</p>
+            
+            <button class="btn btn--mp-pix btn--block" id="mpPixBtn" type="button">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span id="mpPixBtnText">Pagar no Pix via Mercado Pago</span>
+              <span id="mpPixBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
+            </button>
+
+            <button class="btn btn--mp-pay btn--block" id="mpCardBtn" type="button" style="margin-top: 0.5rem;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <span id="mpCardBtnText">Pagar no Cartão (em até 12x)</span>
+              <span id="mpCardBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
             </button>
           </div>
 
@@ -649,9 +660,9 @@
     <p class="noscript" style="text-align: center; padding: 1rem; background: #fff;">Ative o JavaScript para aproveitar todas as funcionalidades do site.</p>
   </noscript>
 
-  <script src="data/lua-de-mel.js?v=mp2027v1"></script>
-  <script src="data/presentes-virtuais.js?v=mp2027v1"></script>
-  <script src="data/items.js?v=mp2027v1"></script>
-  <script src="script.js?v=mp2027v1"></script>
+  <script src="data/lua-de-mel.js?v=mp2027v2"></script>
+  <script src="data/presentes-virtuais.js?v=mp2027v2"></script>
+  <script src="data/items.js?v=mp2027v2"></script>
+  <script src="script.js?v=mp2027v2"></script>
 </body>
 </html>
