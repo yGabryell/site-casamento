@@ -2083,6 +2083,48 @@ function checkMercadoPagoReturn() {
         renderGiftList();
       }
 
+      // Confirma automaticamente a compra no Supabase para que fique indisponível para todos os visitantes
+      const paymentId = url.searchParams.get("payment_id") || url.searchParams.get("collection_id") || "";
+      const confirmEndpoint = window.location.hostname.includes("netlify")
+        ? "/.netlify/functions/confirm-purchase"
+        : "/api/confirm-purchase";
+
+      void (async () => {
+        try {
+          let confirmRes = await fetch(confirmEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              itemId: foundId,
+              guestName,
+              itemName: item ? item.nome : "Presente",
+              paymentId,
+            }),
+          });
+          if (confirmRes.status === 404) {
+            const fallback = confirmEndpoint.startsWith("/api")
+              ? "/.netlify/functions/confirm-purchase"
+              : "/api/confirm-purchase";
+            confirmRes = await fetch(fallback, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                itemId: foundId,
+                guestName,
+                itemName: item ? item.nome : "Presente",
+                paymentId,
+              }),
+            });
+          }
+          if (confirmRes.ok) {
+            await hydrateItems();
+            renderGiftList();
+          }
+        } catch (confirmErr) {
+          console.warn("Aviso ao confirmar no backend:", confirmErr);
+        }
+      })();
+
       showToast(`🎉 Pagamento aprovado! Muito obrigado pelo carinho${guestName ? ", " + guestName : ""}!`);
 
       if (el.purchaseSuccess) {

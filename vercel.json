@@ -4,6 +4,14 @@
     {
       "source": "/.netlify/functions/create-preference",
       "destination": "/api/create-preference"
+    },
+    {
+      "source": "/.netlify/functions/confirm-purchase",
+      "destination": "/api/confirm-purchase"
+    },
+    {
+      "source": "/.netlify/functions/mercadopago-webhook",
+      "destination": "/api/mercadopago-webhook"
     }
   ]
 }

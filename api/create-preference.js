@@ -96,6 +96,7 @@ module.exports = async (req, res) => {
       auto_return: "approved",
       statement_descriptor: "CASAMENTO E&G",
       external_reference: externalRef,
+      notification_url: `${SITE_URL}/api/mercadopago-webhook`,
       payment_methods: paymentMethodsConfig,
     };
 
