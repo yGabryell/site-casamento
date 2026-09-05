@@ -9,7 +9,7 @@ const CONFIG = {
   weddingDate: "2027-05-01T16:00:00",
   city: "Chã do Pilar - AL",
   eventAddress: "Casa Berlins - Chã do Pilar",
-  eventTime: "CERIMÔNIA 16H",
+  eventTime: "Cerimônia 16h",
   // Troque por um PIN seu para proteger o reset administrativo.
   adminPin: "EG01052027",
   whatsappPhone: "5582996013473",
