@@ -438,12 +438,9 @@ function setupPhotoCarousel() {
   el.carouselTrack.innerHTML = photos
     .map(
       (path, index) => `
-        <div class="carousel__slide" data-slide-index="${index}" role="group" aria-roledescription="slide" aria-label="${index + 1} de ${photos.length}">
+        <div class="carousel__slide" data-slide-index="${index}" role="group" aria-roledescription="slide" aria-label="Foto ${index + 1} de ${photos.length}">
           <figure class="carousel__figure">
-            <img src="${path}" alt="Foto ${index + 1} do ensaio pré-wedding de ${escapeHtml(CONFIG.coupleNames)}" loading="lazy" decoding="async" class="carousel__img">
-            <div class="carousel__overlay-badge">
-              <span>Pré-Wedding • Foto ${index + 1}</span>
-            </div>
+            <img src="${path}" alt="Foto ${index + 1} de ${escapeHtml(CONFIG.coupleNames)}" loading="lazy" decoding="async" class="carousel__img">
           </figure>
         </div>
       `
@@ -611,9 +608,9 @@ function openLightbox(index) {
   if (!photos.length || !el.photoLightbox || !el.lightboxImg) return;
   const photoSrc = photos[index] || photos[0];
   el.lightboxImg.src = photoSrc;
-  el.lightboxImg.alt = `Foto ${index + 1} do ensaio pré-wedding`;
+  el.lightboxImg.alt = `Foto ${index + 1} de ${photos.length}`;
   if (el.lightboxCaption) {
-    el.lightboxCaption.textContent = `${CONFIG.coupleNames} • Ensaio Pré-Wedding (${index + 1} de ${photos.length})`;
+    el.lightboxCaption.textContent = `${CONFIG.coupleNames} (${index + 1} de ${photos.length})`;
   }
   el.photoLightbox.hidden = false;
   document.body.style.overflow = "hidden";
