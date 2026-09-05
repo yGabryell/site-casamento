@@ -1920,6 +1920,7 @@ async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
   setMpPayLoading(true, paymentMethod);
   setPurchaseFeedback("");
 
+  try {
     const preferencePayload = {
       itemId: item.id,
       itemName: item.nome,
