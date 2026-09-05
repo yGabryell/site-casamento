@@ -2630,14 +2630,8 @@ function setupScrollSpy() {
   sections.forEach((sec) => observer.observe(sec));
 }
 
-function itemStatusHelperMarkup(item) {
-  if (!item.reservedBy) return "";
-  if (item.status === "pending") {
-    return `<p class="gift-card__reserved-by">Compra informada por ${escapeHtml(item.reservedBy)}</p>`;
-  }
-  if (item.status === "purchased") {
-    return `<p class="gift-card__reserved-by">Comprado por ${escapeHtml(item.reservedBy)}</p>`;
-  }
+function itemStatusHelperMarkup(_item) {
+  // O nome de quem presenteou fica visível exclusivamente para os noivos no painel administrativo
   return "";
 }
 
