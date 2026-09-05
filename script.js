@@ -73,7 +73,7 @@ const state = {
   carouselTouchStartX: 0,
   carouselTouchDeltaX: 0,
   activePage: "inicio",
-  giftCategory: "honeymoon",
+  giftCategory: "registry",
   giftPages: {
     honeymoon: 1,
     registry: 1,
