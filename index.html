@@ -270,84 +270,6 @@
       <div class="gift-grid" id="giftList" aria-live="polite"></div>
       <nav class="gift-pagination" id="giftPagination" aria-label="Paginação dos presentes" hidden></nav>
       <p class="empty-state" id="giftEmptyState" hidden>Nenhum presente disponível no momento.</p>
-
-      <!-- Modal de Presentear com suporte a PIX -->
-      <section class="purchase-inline" id="purchaseModal" aria-labelledby="modalTitle" style="max-width: 620px; margin: 2rem auto;">
-        <h3 id="modalTitle" style="text-align: center;">Presentear os Noivos</h3>
-        <p id="modalText" hidden></p>
-
-        <div class="modal__group purchase-flow" id="purchaseFlow" hidden>
-          <label class="admin-label" for="purchaseGuestName">Seu nome para identificar o presente *</label>
-          <input class="admin-input" id="purchaseGuestName" type="text" maxlength="50" placeholder="Ex: Maria e Carlos Silva">
-
-          <!-- Opções de Pagamento: Pix e Cartão -->
-          <div class="payment-method-card payment-method-card--mp">
-            <div class="payment-method-card__header">
-              <span class="payment-method-card__title">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                Pix, Cartão de Crédito/Débito
-              </span>
-              <div class="payment-method-card__badges">
-                <span class="payment-method-card__badge">Cartão até 12x</span>
-              </div>
-            </div>
-            <p class="payment-method-card__desc">Escolha como prefere realizar o pagamento:</p>
-            
-            <button class="btn btn--mp-pix btn--block" id="mpPixBtn" type="button">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              <span id="mpPixBtnText">Pagar no Pix</span>
-              <span id="mpPixBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
-            </button>
-
-            <button class="btn btn--mp-pay btn--block" id="mpCardBtn" type="button" style="margin-top: 0.5rem;">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-              <span id="mpCardBtnText">Pagar no Cartão (em até 12x)</span>
-              <span id="mpCardBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
-            </button>
-          </div>
-
-          <p id="purchaseFeedback" class="modal__feedback"></p>
-
-          <div class="modal__actions">
-            <a class="btn btn--secondary btn--block" id="externalLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Link externo</a>
-          </div>
-        </div>
-
-        <!-- Tela de Pagamento Pix Direto no Site (sem sair da página e sem exigir e-mail) -->
-        <div class="modal__group purchase-pix-view" id="purchasePixView" hidden style="text-align: center;">
-          <h4 style="margin-bottom: 0.4rem; color: var(--accent-dark);">Pagamento via Pix</h4>
-          <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">Abra o app do seu banco e escaneie o QR Code ou copie o código Pix abaixo:</p>
-
-          <div style="background: #ffffff; padding: 1rem; border-radius: 14px; display: inline-block; border: 1px solid var(--line); margin-bottom: 1rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-            <img id="pixQrCodeImg" src="" alt="QR Code Pix" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
-          </div>
-
-          <div style="margin-bottom: 1.2rem;">
-            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem;">Valor do presente:</p>
-            <strong id="pixAmountText" style="font-size: 1.5rem; color: var(--accent-dark); display: block;">R$ 0,00</strong>
-          </div>
-
-          <button class="btn btn--primary btn--block" id="copyPixCodeBtn" type="button" style="margin-bottom: 0.8rem; font-weight: 600;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span id="copyPixCodeBtnText">Copiar Código Pix (Copia e Cola)</span>
-          </button>
-
-          <div id="pixStatusIndicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--accent-dark); font-size: 0.88rem; margin: 1rem 0; font-weight: 500;">
-            <span class="btn-spinner" style="border-color: var(--accent-dark); border-top-color: transparent;"></span>
-            <span>Aguardando confirmação do pagamento...</span>
-          </div>
-
-          <button class="btn btn--ghost btn--block" id="cancelPixBtn" type="button" style="font-size: 0.88rem;">Voltar para opções</button>
-        </div>
-
-        <div class="purchase-success" id="purchaseSuccess" hidden>
-          <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
-          <h4 class="purchase-success__title">Muito obrigado pelo carinho!</h4>
-          <p class="purchase-success__text" id="purchaseSuccessMessage"></p>
-          <p class="purchase-success__hint">Seu presente foi confirmado com sucesso e a mensagem enviada aos noivos!</p>
-          <button class="btn btn--primary btn--block" id="purchaseSuccessCloseBtn" type="button">Registrar outro presente</button>
-        </div>
-      </section>
     </section>
 
     <!-- Confirmação de Presença (RSVP) -->
@@ -395,7 +317,19 @@
             <h4 class="purchase-success__title">Resposta registrada com sucesso!</h4>
             <p class="purchase-success__text" id="rsvpSuccessMessage"></p>
             <p class="purchase-success__hint" id="rsvpSuccessHint">Agradecemos por nos informar. Até breve!</p>
-            <button class="btn btn--primary btn--block" id="rsvpSuccessCloseBtn" type="button">Registrar nova resposta</button>
+
+            <div class="rsvp-next-steps" style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 0.75rem;">
+              <p style="font-size: 0.9rem; font-weight: 600; color: var(--accent-dark); margin-bottom: 0.2rem;">O que você deseja ver a seguir?</p>
+              <a class="btn btn--primary btn--block" data-nav href="#informacoes">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Ver Horário, Local e Traje
+              </a>
+              <a class="btn btn--secondary btn--block" data-nav href="#presentes">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect width="20" height="5" x="2" y="7"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+                Ver Lista de Presentes
+              </a>
+              <button class="btn btn--ghost btn--block" id="rsvpSuccessCloseBtn" type="button" style="font-size: 0.85rem; margin-top: 0.2rem;">Confirmar presença de outro familiar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -510,6 +444,17 @@
           </div>
         </div>
       </div>
+
+      <!-- Banner de Transição da Jornada: Rumo aos Presentes -->
+      <div class="journey-next-card">
+        <div class="journey-next-card__icon" aria-hidden="true">🎁</div>
+        <h3 class="journey-next-card__title">Quer nos abençoar com um presente?</h3>
+        <p class="journey-next-card__text">Preparamos uma lista de presentes virtuais e cotas de lua de mel com muito carinho para você fazer parte desse novo capítulo da nossa história.</p>
+        <a class="btn btn--primary" data-nav href="#presentes" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>Conhecer Lista de Presentes</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+      </div>
     </section>
 
     <!-- Mural de Mensagens -->
@@ -611,6 +556,117 @@
         </section>
       </div>
     </section>
+
+    <!-- Modal / Carrinho de Presente Flutuante e Elegante -->
+    <div class="cart-modal" id="purchaseModal" hidden aria-labelledby="modalTitle" role="dialog" aria-modal="true">
+      <div class="cart-modal__backdrop" id="cartModalBackdrop"></div>
+      <div class="cart-modal__dialog">
+        <div class="cart-modal__header">
+          <div>
+            <span class="cart-modal__eyebrow">Carrinho de Presente</span>
+            <h3 id="modalTitle" class="cart-modal__title">Presentear os Noivos</h3>
+          </div>
+          <button class="cart-modal__close" id="closeModalBtn" type="button" aria-label="Fechar modal">&times;</button>
+        </div>
+        <p id="modalText" class="cart-modal__subtitle" hidden></p>
+
+        <!-- Resumo do Presente Selecionado -->
+        <div class="cart-item-card" id="cartItemCard">
+          <img class="cart-item-card__img" id="cartItemThumb" src="assets/items/item1.jpg" alt="Presente">
+          <div class="cart-item-card__info">
+            <span class="cart-item-card__category" id="cartItemCategory">Presente Virtual</span>
+            <h4 class="cart-item-card__title" id="cartItemName">Nome do Presente</h4>
+            <strong class="cart-item-card__price" id="cartItemPrice">R$ 0,00</strong>
+          </div>
+          <button class="cart-item-card__change" id="cartItemChangeBtn" type="button" title="Trocar por outro presente">Trocar</button>
+        </div>
+
+        <!-- Fluxo de Identificação e Pagamento -->
+        <div class="modal__group purchase-flow" id="purchaseFlow">
+          <label class="admin-label" for="purchaseGuestName">Seu nome para identificar o presente *</label>
+          <input class="admin-input" id="purchaseGuestName" type="text" maxlength="50" placeholder="Ex: Maria e Carlos Silva" autocomplete="name">
+
+          <!-- Opções de Pagamento: Pix e Cartão -->
+          <div class="payment-method-card payment-method-card--mp">
+            <div class="payment-method-card__header">
+              <span class="payment-method-card__title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                Formas de Pagamento
+              </span>
+              <div class="payment-method-card__badges">
+                <span class="payment-method-card__badge payment-method-card__badge--pix">Pix Direto</span>
+                <span class="payment-method-card__badge">Cartão até 12x</span>
+              </div>
+            </div>
+            <p class="payment-method-card__desc">Escolha como prefere realizar o pagamento:</p>
+            
+            <button class="btn btn--mp-pix btn--block" id="mpPixBtn" type="button">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span id="mpPixBtnText">Pagar com Pix</span>
+              <span id="mpPixBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
+            </button>
+
+            <button class="btn btn--mp-pay btn--block" id="mpCardBtn" type="button" style="margin-top: 0.5rem;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <span id="mpCardBtnText">Pagar no Cartão (em até 12x)</span>
+              <span id="mpCardBtnSpinner" class="btn-spinner" hidden aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <p id="purchaseFeedback" class="modal__feedback"></p>
+
+          <div class="modal__actions">
+            <a class="btn btn--secondary btn--block" id="externalLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Link externo</a>
+          </div>
+        </div>
+
+        <!-- Tela de Pagamento Pix Direto no Site -->
+        <div class="modal__group purchase-pix-view" id="purchasePixView" hidden style="text-align: center;">
+          <h4 style="margin-bottom: 0.3rem; color: var(--accent-dark);">Pagamento via Pix</h4>
+          <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 0.9rem;">Abra o app do seu banco e escaneie o QR Code ou copie o código Pix:</p>
+
+          <div style="background: #ffffff; padding: 0.9rem; border-radius: 14px; display: inline-block; border: 1px solid var(--line); margin-bottom: 0.8rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+            <img id="pixQrCodeImg" src="" alt="QR Code Pix" style="max-width: 210px; width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 0.1rem;">Valor do presente:</p>
+            <strong id="pixAmountText" style="font-size: 1.45rem; color: var(--accent-dark); display: block;">R$ 0,00</strong>
+          </div>
+
+          <button class="btn btn--primary btn--block" id="copyPixCodeBtn" type="button" style="margin-bottom: 0.8rem; font-weight: 600;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copyPixCodeBtnText">Copiar Código Pix (Copia e Cola)</span>
+          </button>
+
+          <div id="pixStatusIndicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--accent-dark); font-size: 0.85rem; margin: 0.9rem 0; font-weight: 500;">
+            <span class="btn-spinner" style="border-color: var(--accent-dark); border-top-color: transparent;"></span>
+            <span>Aguardando confirmação do banco...</span>
+          </div>
+
+          <button class="btn btn--ghost btn--block" id="cancelPixBtn" type="button" style="font-size: 0.88rem;">Voltar para opções</button>
+        </div>
+
+        <!-- Tela de Sucesso com o Gran Finale: Direcionamento para Mensagens -->
+        <div class="purchase-success" id="purchaseSuccess" hidden>
+          <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
+          <h4 class="purchase-success__title">Muito obrigado pelo carinho!</h4>
+          <p class="purchase-success__text" id="purchaseSuccessMessage"></p>
+          <p class="purchase-success__hint">Seu presente foi confirmado com sucesso e recebido com muito amor pelos noivos!</p>
+          
+          <div class="purchase-success__next-step" style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line);">
+            <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent-dark); margin-bottom: 0.8rem;">
+              Complete sua homenagem deixando um recado no nosso mural:
+            </p>
+            <button class="btn btn--primary btn--block" id="goToMessagesBtn" type="button" style="font-size: 1rem; padding: 0.85rem 1rem;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Deixar uma Mensagem aos Noivos
+            </button>
+            <button class="btn btn--ghost btn--block" id="purchaseSuccessCloseBtn" type="button" style="margin-top: 0.6rem; font-size: 0.85rem;">Concluir e voltar ao site</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Barra de Navegação Inferior (Mobile Exclusiva) -->

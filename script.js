@@ -234,9 +234,16 @@ function cacheElements() {
   el.messagesEmptyState = document.getElementById("messagesEmptyState");
 
   el.purchaseModal = document.getElementById("purchaseModal");
+  el.cartModalBackdrop = document.getElementById("cartModalBackdrop");
   el.closeModalBtn = document.getElementById("closeModalBtn");
   el.modalTitle = document.getElementById("modalTitle");
   el.modalText = document.getElementById("modalText");
+  el.cartItemCard = document.getElementById("cartItemCard");
+  el.cartItemThumb = document.getElementById("cartItemThumb");
+  el.cartItemCategory = document.getElementById("cartItemCategory");
+  el.cartItemName = document.getElementById("cartItemName");
+  el.cartItemPrice = document.getElementById("cartItemPrice");
+  el.cartItemChangeBtn = document.getElementById("cartItemChangeBtn");
   el.purchaseGuestName = document.getElementById("purchaseGuestName");
   el.purchaseFlow = document.getElementById("purchaseFlow");
   el.purchasePixView = document.getElementById("purchasePixView");
@@ -251,6 +258,7 @@ function cacheElements() {
   el.purchaseSuccess = document.getElementById("purchaseSuccess");
   el.purchaseSuccessMessage = document.getElementById("purchaseSuccessMessage");
   el.purchaseSuccessCloseBtn = document.getElementById("purchaseSuccessCloseBtn");
+  el.goToMessagesBtn = document.getElementById("goToMessagesBtn");
 
   el.openAdminBtn = document.getElementById("openAdminBtn");
   el.adminModal = document.getElementById("adminModal");
@@ -1367,6 +1375,33 @@ function bindPurchaseEvents() {
     el.submitReceiptBtn.addEventListener("click", handlePurchaseSubmission);
   }
 
+  if (el.closeModalBtn) {
+    el.closeModalBtn.addEventListener("click", closePurchaseModal);
+  }
+
+  if (el.cartModalBackdrop) {
+    el.cartModalBackdrop.addEventListener("click", closePurchaseModal);
+  }
+
+  if (el.cartItemChangeBtn) {
+    el.cartItemChangeBtn.addEventListener("click", closePurchaseModal);
+  }
+
+  if (el.goToMessagesBtn) {
+    el.goToMessagesBtn.addEventListener("click", () => {
+      const guestName = (el.purchaseGuestName ? el.purchaseGuestName.value : "").trim() || readStoredGuestName();
+      closePurchaseModal();
+      showPage("mensagens", { updateHash: true, resetScroll: true });
+      if (el.messageGuestName && guestName) {
+        el.messageGuestName.value = guestName;
+      }
+      setTimeout(() => {
+        if (el.messageText) el.messageText.focus();
+      }, 350);
+      showToast("Deixe sua mensagem especial para os noivos! 💌");
+    });
+  }
+
   if (el.purchaseSuccessCloseBtn) {
     el.purchaseSuccessCloseBtn.addEventListener("click", closePurchaseModal);
   }
@@ -1377,6 +1412,12 @@ function bindPurchaseEvents() {
       showToast("Finalize o pagamento e confirme a compra");
     });
   }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && el.purchaseModal && el.purchaseModal.classList.contains("is-open")) {
+      closePurchaseModal();
+    }
+  });
 }
 
 function openRsvpModal() {
@@ -1387,7 +1428,7 @@ function openRsvpModal() {
 }
 
 function closeRsvpModal() {
-  resetRsvpForm(false);
+  resetRsvpForm(true);
 }
 
 function resetRsvpForm(clearName) {
@@ -1756,23 +1797,48 @@ function openPurchaseModal(itemId) {
   if (!item) return;
 
   if (item.status === "purchased") {
-    showToast("Este item já foi confirmado como comprado");
+    showToast("Este presente já foi adquirido por outro convidado");
     return;
   }
 
   if (item.status === "pending") {
-    showToast("Este item já está aguardando confirmação");
+    showToast("Este presente já está aguardando confirmação de pagamento");
     return;
   }
 
   state.activePurchaseItemId = itemId;
   resetPurchaseForm(false, true);
-  el.purchaseGuestName.value = readStoredGuestName();
-  el.modalTitle.textContent = `Presentear: ${item.nome}`;
-  el.modalText.hidden = false;
-  el.modalText.textContent = `Escolha como prefere presentear: Pix ou Cartão de Crédito/Débito.`;
+
+  // Preenche dados do presente no card do carrinho
+  if (el.cartItemThumb) {
+    el.cartItemThumb.src = item.foto || "assets/items/item1.jpg";
+    el.cartItemThumb.alt = item.nome;
+  }
+  if (el.cartItemName) {
+    el.cartItemName.textContent = item.nome;
+  }
+  if (el.cartItemCategory) {
+    el.cartItemCategory.textContent = item.category === "honeymoon" ? "Lua de Mel" : "Presente Virtual";
+  }
+  if (el.cartItemPrice) {
+    el.cartItemPrice.textContent = formatCurrency(item.preco);
+  }
+  if (el.cartItemCard) {
+    el.cartItemCard.hidden = false;
+  }
+
+  if (el.purchaseGuestName) {
+    el.purchaseGuestName.value = readStoredGuestName();
+  }
+  if (el.modalTitle) {
+    el.modalTitle.textContent = "Presentear os Noivos";
+  }
+  if (el.modalText) {
+    el.modalText.hidden = false;
+    el.modalText.textContent = `Você escolheu: ${item.nome}. Finalize seu carinho abaixo:`;
+  }
   if (el.mpPixBtnText) {
-    el.mpPixBtnText.textContent = `Pagar no Pix (${formatCurrency(item.preco)})`;
+    el.mpPixBtnText.textContent = `Pagar com Pix (${formatCurrency(item.preco)})`;
   }
   if (el.mpCardBtnText) {
     el.mpCardBtnText.textContent = `Pagar no Cartão (${formatCurrency(item.preco)})`;
@@ -1782,7 +1848,16 @@ function openPurchaseModal(itemId) {
   if (el.externalLink) {
     el.externalLink.href = item.links.external || CONFIG.defaultLinks.externalStore;
   }
-  showPage("presentes", { updateHash: true, resetScroll: false });
+
+  // Abre o modal de carrinho flutuante de forma limpa, sem rolar a tela para baixo!
+  if (el.purchaseModal) {
+    el.purchaseModal.hidden = false;
+    requestAnimationFrame(() => {
+      el.purchaseModal.classList.add("is-open");
+    });
+    document.body.style.overflow = "hidden";
+  }
+
   if (el.purchaseGuestName) {
     window.setTimeout(() => el.purchaseGuestName.focus(), 220);
   }
@@ -1794,8 +1869,23 @@ function closePurchaseModal() {
   state.activePurchaseItemId = null;
   resetPurchaseForm(true, false);
   setMpPayLoading(false);
+
+  if (el.purchaseModal) {
+    if (!el.purchaseModal.classList.contains("is-open")) {
+      el.purchaseModal.hidden = true;
+    } else {
+      el.purchaseModal.classList.remove("is-open");
+      window.setTimeout(() => {
+        if (el.purchaseModal && !el.purchaseModal.classList.contains("is-open")) {
+          el.purchaseModal.hidden = true;
+        }
+      }, 280);
+    }
+    document.body.style.overflow = "";
+  }
+
   if (el.modalTitle) {
-    el.modalTitle.textContent = "Presentear";
+    el.modalTitle.textContent = "Presentear os Noivos";
   }
   if (el.modalText) {
     el.modalText.textContent = "";
@@ -1813,6 +1903,9 @@ function resetPurchaseForm(clearName, showFlow) {
   stopPixPolling();
   if (el.purchasePixView) {
     el.purchasePixView.hidden = true;
+  }
+  if (el.cartItemCard) {
+    el.cartItemCard.hidden = !Boolean(showFlow);
   }
   const shouldShowFlow = Boolean(showFlow);
   state.purchaseSubmitBusy = false;
@@ -1836,23 +1929,28 @@ function resetPurchaseForm(clearName, showFlow) {
 function showPurchaseSuccess(itemName, guestName) {
   const namedGuest = guestName && guestName !== "Convidado" ? `${guestName}, ` : "";
   if (el.modalTitle) {
-    el.modalTitle.textContent = "Tudo certo!";
+    el.modalTitle.textContent = "Presente Confirmado! 🎉";
   }
   if (el.modalText) {
     el.modalText.hidden = false;
-    el.modalText.textContent = "Recebemos sua confirmação de compra com sucesso.";
+    el.modalText.textContent = "Recebemos sua confirmação com muita gratidão.";
+  }
+  if (el.cartItemCard) {
+    el.cartItemCard.hidden = true;
   }
   if (el.purchaseFlow) {
     el.purchaseFlow.hidden = true;
   }
   if (el.purchaseSuccessMessage) {
-    el.purchaseSuccessMessage.textContent = `${namedGuest}recebemos sua confirmação de compra do presente ${itemName}. Obrigado por fazer parte desse momento com a gente.`;
+    el.purchaseSuccessMessage.textContent = `${namedGuest}muito obrigado por nos presentear com ${itemName}! É uma honra imensa ter o seu carinho marcando esse início de nossa vida a dois.`;
   }
   if (el.purchaseSuccess) {
     el.purchaseSuccess.hidden = false;
   }
   requestAnimationFrame(() => {
-    if (el.purchaseSuccessCloseBtn) {
+    if (el.goToMessagesBtn) {
+      el.goToMessagesBtn.focus();
+    } else if (el.purchaseSuccessCloseBtn) {
       el.purchaseSuccessCloseBtn.focus();
     }
   });
