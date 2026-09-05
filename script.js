@@ -126,7 +126,7 @@ async function init() {
     setupPhotoCarousel();
     renderGiftList();
     renderGuestMessages();
-    closePurchaseModal();
+    closePurchaseModal(true);
     bindEvents();
     startCountdown();
     setupRevealAnimations();
@@ -259,6 +259,10 @@ function cacheElements() {
   el.purchaseSuccessMessage = document.getElementById("purchaseSuccessMessage");
   el.purchaseSuccessCloseBtn = document.getElementById("purchaseSuccessCloseBtn");
   el.goToMessagesBtn = document.getElementById("goToMessagesBtn");
+  el.cartFloatingBtn = document.getElementById("cartFloatingBtn");
+  el.cartFloatingPrice = document.getElementById("cartFloatingPrice");
+  el.headerCartBtn = document.getElementById("headerCartBtn");
+  el.headerCartBadge = document.getElementById("headerCartBadge");
 
   el.openAdminBtn = document.getElementById("openAdminBtn");
   el.adminModal = document.getElementById("adminModal");
@@ -818,6 +822,8 @@ function renderPurchasedList() {
       `;
     })
     .join("");
+
+  updateCartTriggersUI();
 }
 
 function renderAdminRequestList() {
@@ -1376,21 +1382,40 @@ function bindPurchaseEvents() {
   }
 
   if (el.closeModalBtn) {
-    el.closeModalBtn.addEventListener("click", closePurchaseModal);
+    el.closeModalBtn.addEventListener("click", () => closePurchaseModal(false));
   }
 
   if (el.cartModalBackdrop) {
-    el.cartModalBackdrop.addEventListener("click", closePurchaseModal);
+    el.cartModalBackdrop.addEventListener("click", () => closePurchaseModal(false));
   }
 
   if (el.cartItemChangeBtn) {
-    el.cartItemChangeBtn.addEventListener("click", closePurchaseModal);
+    el.cartItemChangeBtn.addEventListener("click", () => {
+      closePurchaseModal(true);
+      showToast("Presente removido. Escolha outro presente na lista!");
+    });
+  }
+
+  if (el.cartFloatingBtn) {
+    el.cartFloatingBtn.addEventListener("click", () => {
+      if (state.activePurchaseItemId) {
+        openPurchaseModal(state.activePurchaseItemId);
+      }
+    });
+  }
+
+  if (el.headerCartBtn) {
+    el.headerCartBtn.addEventListener("click", () => {
+      if (state.activePurchaseItemId) {
+        openPurchaseModal(state.activePurchaseItemId);
+      }
+    });
   }
 
   if (el.goToMessagesBtn) {
     el.goToMessagesBtn.addEventListener("click", () => {
       const guestName = (el.purchaseGuestName ? el.purchaseGuestName.value : "").trim() || readStoredGuestName();
-      closePurchaseModal();
+      closePurchaseModal(true);
       showPage("mensagens", { updateHash: true, resetScroll: true });
       if (el.messageGuestName && guestName) {
         el.messageGuestName.value = guestName;
@@ -1403,7 +1428,7 @@ function bindPurchaseEvents() {
   }
 
   if (el.purchaseSuccessCloseBtn) {
-    el.purchaseSuccessCloseBtn.addEventListener("click", closePurchaseModal);
+    el.purchaseSuccessCloseBtn.addEventListener("click", () => closePurchaseModal(true));
   }
 
   if (el.externalLink) {
@@ -1415,7 +1440,7 @@ function bindPurchaseEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && el.purchaseModal && el.purchaseModal.classList.contains("is-open")) {
-      closePurchaseModal();
+      closePurchaseModal(false);
     }
   });
 }
@@ -1792,6 +1817,29 @@ function bindFaqEvents() {
   });
 }
 
+function updateCartTriggersUI() {
+  const activeItem = state.items.find((entry) => entry.id === state.activePurchaseItemId);
+  const hasItem = Boolean(activeItem && activeItem.status !== "purchased");
+
+  if (!hasItem && state.activePurchaseItemId) {
+    state.activePurchaseItemId = null;
+  }
+
+  if (el.cartFloatingBtn) {
+    el.cartFloatingBtn.hidden = !hasItem;
+    if (hasItem && el.cartFloatingPrice) {
+      el.cartFloatingPrice.textContent = formatCurrency(activeItem.preco);
+    }
+  }
+
+  if (el.headerCartBtn) {
+    el.headerCartBtn.hidden = !hasItem;
+    if (hasItem && el.headerCartBadge) {
+      el.headerCartBadge.textContent = "1";
+    }
+  }
+}
+
 function openPurchaseModal(itemId) {
   const item = state.items.find((entry) => entry.id === itemId);
   if (!item) return;
@@ -1849,6 +1897,9 @@ function openPurchaseModal(itemId) {
     el.externalLink.href = item.links.external || CONFIG.defaultLinks.externalStore;
   }
 
+  // Atualiza indicadores persistentes do carrinho
+  updateCartTriggersUI();
+
   // Abre o modal de carrinho flutuante de forma limpa, sem rolar a tela para baixo!
   if (el.purchaseModal) {
     el.purchaseModal.hidden = false;
@@ -1863,12 +1914,22 @@ function openPurchaseModal(itemId) {
   }
 }
 
-function closePurchaseModal() {
+function closePurchaseModal(clearCart = false) {
   const closingItemId = state.activePurchaseItemId;
   const wasInPix = el.purchasePixView && !el.purchasePixView.hidden;
-  state.activePurchaseItemId = null;
-  resetPurchaseForm(true, false);
-  setMpPayLoading(false);
+
+  if (clearCart) {
+    state.activePurchaseItemId = null;
+    resetPurchaseForm(true, false);
+    setMpPayLoading(false);
+  } else {
+    // Mantém o item ativo para o convidado reabrir pelo botão de carrinho
+    if (closingItemId) {
+      showToast("Seu presente continua no carrinho! 🛒 Clique no botão flutuante para voltar.");
+    }
+  }
+
+  updateCartTriggersUI();
 
   if (el.purchaseModal) {
     if (!el.purchaseModal.classList.contains("is-open")) {
@@ -1891,7 +1952,8 @@ function closePurchaseModal() {
     el.modalText.textContent = "";
     el.modalText.hidden = true;
   }
-  if (wasInPix && closingItemId) {
+
+  if (clearCart && wasInPix && closingItemId) {
     void releaseItemReservation(closingItemId).then(async () => {
       await hydrateItems();
       renderGiftList();
@@ -1927,6 +1989,9 @@ function resetPurchaseForm(clearName, showFlow) {
 }
 
 function showPurchaseSuccess(itemName, guestName) {
+  state.activePurchaseItemId = null;
+  updateCartTriggersUI();
+
   const namedGuest = guestName && guestName !== "Convidado" ? `${guestName}, ` : "";
   if (el.modalTitle) {
     el.modalTitle.textContent = "Presente Confirmado! 🎉";
@@ -1946,6 +2011,13 @@ function showPurchaseSuccess(itemName, guestName) {
   }
   if (el.purchaseSuccess) {
     el.purchaseSuccess.hidden = false;
+  }
+  if (el.purchaseModal) {
+    el.purchaseModal.hidden = false;
+    requestAnimationFrame(() => {
+      el.purchaseModal.classList.add("is-open");
+    });
+    document.body.style.overflow = "hidden";
   }
   requestAnimationFrame(() => {
     if (el.goToMessagesBtn) {
