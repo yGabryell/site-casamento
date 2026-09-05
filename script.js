@@ -1811,7 +1811,7 @@ function openPurchaseModal(itemId) {
 
   // Preenche dados do presente no card do carrinho
   if (el.cartItemThumb) {
-    el.cartItemThumb.src = item.foto || "assets/items/item1.jpg";
+    el.cartItemThumb.src = item.imagem || item.foto || "";
     el.cartItemThumb.alt = item.nome;
   }
   if (el.cartItemName) {
