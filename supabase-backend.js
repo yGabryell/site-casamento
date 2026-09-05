@@ -1,4 +1,4 @@
-﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const GIFT_STATES_TABLE = "wedding_gift_states";
 
@@ -16,17 +16,32 @@ export function createSupabaseBackend(config) {
     async loadGiftStates() {
       const { data, error } = await client
         .from(GIFT_STATES_TABLE)
-        .select("item_id, status, reserved_by")
+        .select("item_id, status, reserved_by, updated_at")
         .order("item_id", { ascending: true });
 
       if (error) {
         throw buildError(error, "Nao foi possivel carregar os status dos presentes no Supabase.");
       }
 
+      const PENDING_EXPIRATION_MS = 5 * 60 * 1000; // 5 minutos para pagamento
+      const now = Date.now();
+
       return (data || []).reduce((accumulator, row) => {
+        let status = normalizeGiftStatus(row.status);
+        let reservedBy = row.reserved_by || "";
+
+        // Se estiver pendente (Aguardando) e passou mais de 5 minutos, expira e volta a ficar Disponível
+        if (status === "pending") {
+          const updatedAt = row.updated_at ? new Date(row.updated_at).getTime() : 0;
+          if (updatedAt > 0 && now - updatedAt > PENDING_EXPIRATION_MS) {
+            status = "available";
+            reservedBy = "";
+          }
+        }
+
         accumulator[Number(row.item_id)] = {
-          status: normalizeGiftStatus(row.status),
-          reservedBy: row.reserved_by || "",
+          status,
+          reservedBy,
         };
         return accumulator;
       }, {});

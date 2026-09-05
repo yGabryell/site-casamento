@@ -20,6 +20,10 @@
     {
       "source": "/.netlify/functions/mercadopago-webhook",
       "destination": "/api/mercadopago-webhook"
+    },
+    {
+      "source": "/.netlify/functions/release-item",
+      "destination": "/api/release-item"
     }
   ]
 }

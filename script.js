@@ -132,6 +132,7 @@ async function init() {
     setupRevealAnimations();
     setupScrollSpy();
     checkMercadoPagoReturn();
+    setupBackgroundGiftSync();
   } catch (error) {
     handleInitError(error);
   }
@@ -389,10 +390,14 @@ function reconcilePurchaseRequests() {
 
   let changed = false;
   const itemMap = new Map(state.items.map((item) => [String(item.id), item]));
+  const PENDING_TIMEOUT_MS = 5 * 60 * 1000;
+  const now = Date.now();
 
   state.purchaseRequests = state.purchaseRequests.filter((request) => {
     const item = itemMap.get(String(request.itemId));
-    const keep = Boolean(item) && item.status !== "purchased";
+    const submittedTime = request.submittedAt ? new Date(request.submittedAt).getTime() : 0;
+    const isExpired = submittedTime > 0 && now - submittedTime > PENDING_TIMEOUT_MS;
+    const keep = Boolean(item) && item.status !== "purchased" && !isExpired;
     if (!keep) changed = true;
     return keep;
   });
@@ -1344,11 +1349,17 @@ function bindPurchaseEvents() {
   }
 
   if (el.cancelPixBtn) {
-    el.cancelPixBtn.addEventListener("click", () => {
+    el.cancelPixBtn.addEventListener("click", async () => {
       stopPixPolling();
+      const activeId = state.activePurchaseItemId;
       if (el.purchasePixView) el.purchasePixView.hidden = true;
       if (el.purchaseFlow) el.purchaseFlow.hidden = false;
       setPurchaseFeedback("");
+      if (activeId) {
+        await releaseItemReservation(activeId);
+        await hydrateItems();
+        renderGiftList();
+      }
     });
   }
 
@@ -1778,6 +1789,8 @@ function openPurchaseModal(itemId) {
 }
 
 function closePurchaseModal() {
+  const closingItemId = state.activePurchaseItemId;
+  const wasInPix = el.purchasePixView && !el.purchasePixView.hidden;
   state.activePurchaseItemId = null;
   resetPurchaseForm(true, false);
   setMpPayLoading(false);
@@ -1787,6 +1800,12 @@ function closePurchaseModal() {
   if (el.modalText) {
     el.modalText.textContent = "";
     el.modalText.hidden = true;
+  }
+  if (wasInPix && closingItemId) {
+    void releaseItemReservation(closingItemId).then(async () => {
+      await hydrateItems();
+      renderGiftList();
+    });
   }
 }
 
@@ -1920,6 +1939,45 @@ function stopPixPolling() {
   if (pixPollingTimer) {
     clearInterval(pixPollingTimer);
     pixPollingTimer = null;
+  }
+}
+
+async function releaseItemReservation(itemId) {
+  if (!itemId) return;
+  try {
+    const endpoint = window.location.hostname.includes("netlify")
+      ? "/.netlify/functions/release-item"
+      : "/api/release-item";
+
+    let res;
+    try {
+      res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: Number(itemId) }),
+      });
+      if (res.status === 404) {
+        const fallback = endpoint.startsWith("/api")
+          ? "/.netlify/functions/release-item"
+          : "/api/release-item";
+        await fetch(fallback, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemId: Number(itemId) }),
+        });
+      }
+    } catch (_) {
+      const fallback = endpoint.startsWith("/api")
+        ? "/.netlify/functions/release-item"
+        : "/api/release-item";
+      await fetch(fallback, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: Number(itemId) }),
+      });
+    }
+  } catch (err) {
+    console.warn("Erro ao liberar item:", err);
   }
 }
 
@@ -2067,8 +2125,25 @@ function startPixPolling(paymentId, item, guestName) {
     ? `/.netlify/functions/check-pix-status?paymentId=${paymentId}`
     : `/api/check-pix-status?paymentId=${paymentId}`;
 
+  const startTime = Date.now();
+  const PIX_EXPIRATION_MS = 5 * 60 * 1000; // 5 minutos de limite
+
   pixPollingTimer = setInterval(async () => {
     try {
+      // Se exceder 5 minutos sem aprovação, expira e libera o presente
+      if (Date.now() - startTime > PIX_EXPIRATION_MS) {
+        stopPixPolling();
+        await releaseItemReservation(item.id);
+        await hydrateItems();
+        renderGiftList();
+        if (el.purchasePixView && !el.purchasePixView.hidden) {
+          if (el.purchaseFlow) el.purchaseFlow.hidden = false;
+          el.purchasePixView.hidden = true;
+          setPurchaseFeedback("Tempo para pagamento expirado (5 minutos). O presente voltou a ficar disponível.", true);
+        }
+        return;
+      }
+
       const res = await fetch(endpoint);
       if (res.ok) {
         const data = await res.json();
@@ -2093,8 +2168,10 @@ function startPixPolling(paymentId, item, guestName) {
     }
   }, 2500);
 
-  // Cancela polling automático após 10 minutos
-  setTimeout(stopPixPolling, 600000);
+  // Cancela polling automático após 5 minutos
+  setTimeout(async () => {
+    stopPixPolling();
+  }, PIX_EXPIRATION_MS + 2000);
 }
 
 async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
@@ -2740,6 +2817,25 @@ function setCountdownValues(days, hours, minutes, seconds) {
   el.cdMinutes.textContent = String(minutes).padStart(2, "0");
   el.cdSeconds.textContent = String(seconds).padStart(2, "0");
 }
+
+function setupBackgroundGiftSync() {
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible") {
+      await hydrateItems();
+      renderGiftList();
+    }
+  });
+
+  window.setInterval(async () => {
+    // Não recarrega lista se o convidado estiver no meio de um pagamento ativo
+    if (state.activePurchaseItemId && el.purchasePixView && !el.purchasePixView.hidden) {
+      return;
+    }
+    await hydrateItems();
+    renderGiftList();
+  }, 60000);
+}
+
 function setupRevealAnimations() {
   const elements = Array.from(document.querySelectorAll(".fade-in:not(.is-visible)"));
   if (typeof window.IntersectionObserver !== "function") {
