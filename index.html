@@ -22,7 +22,6 @@
     <div class="site-header__inner">
       <a class="site-header__brand" data-nav href="#inicio">
         <span class="site-header__monogram">E &amp; G</span>
-        <span class="site-header__date-tag">01.05.2027</span>
       </a>
 
       <nav class="site-header__nav" aria-label="Navegação desktop">
@@ -91,7 +90,7 @@
       <div class="menu-overlay__header">
         <div class="menu-overlay__brand-wrap">
           <span class="menu-overlay__brand" id="menuOverlayBrand">E &amp; G</span>
-          <span class="menu-overlay__tagline">01 de Maio de 2027</span>
+          <span class="menu-overlay__tagline">Erica &amp; Gabriel</span>
         </div>
         <button class="menu-overlay__close" id="topMenuClose" type="button" aria-label="Fechar menu">&times;</button>
       </div>
@@ -133,7 +132,7 @@
 
   <main>
     <!-- Página Inicial: Conteúdo, Boas-Vindas, Carrossel de Fotos e Contato -->
-    <section class="section section--intro fade-in" id="inicio-conteudo" data-page="inicio" aria-labelledby="fotosTitle">
+    <section class="section section--intro fade-in" id="inicio-conteudo" data-page="inicio" aria-label="Introdução e Fotos">
       <!-- Card da Contagem Regressiva -->
       <div class="countdown-card">
         <p class="intro-countdown-label">CONTAGEM REGRESSIVA PARA O GRANDE DIA</p>
@@ -155,12 +154,7 @@
         <p class="intro-welcome__text">Aqui vamos contar a vocês, queridos amigos e familiares, os momentos mais marcantes da nossa história de amor. A contagem regressiva começa, o frio na barriga e toda a ansiedade do dia mais esperado de nossas vidas nos enchem de alegria em tê-los ao nosso lado. Vamos juntos nesse grande sonho, o dia em que uniremos nossas vidas e corações para sempre!</p>
       </article>
 
-      <!-- Carrossel de Fotos Pré-Wedding -->
-      <div class="photos-section-header">
-        <p class="section__eyebrow">Momentos Inesquecíveis</p>
-        <h2 id="fotosTitle">Ensaio Pré-Wedding</h2>
-        <p class="section__subtitle">Um vislumbre do amor e cumplicidade que nos trouxeram até aqui. Toque na imagem para ampliar.</p>
-      </div>
+      <!-- Carrossel de Fotos -->
 
       <div class="carousel" id="photoCarousel" aria-label="Carrossel de fotos pré-wedding" role="region">
         <div class="carousel__viewport" id="carouselViewport">
@@ -227,107 +221,8 @@
       </article>
     </section>
 
-    <!-- Confirmação de Presença (RSVP) -->
-    <section class="section fade-in" id="confirmacao" data-page="confirmacao" aria-labelledby="confirmacaoTitle" hidden>
-      <div class="section-title-wrap">
-        <p class="section__eyebrow">Sua presença é fundamental</p>
-        <h2 id="confirmacaoTitle">Confirmação de Presença</h2>
-      </div>
-
-      <div id="rsvpModal" class="rsvp-modal rsvp-inline">
-        <div class="rsvp-modal__hero">
-          <h3 id="rsvpTitle">Erica &amp; Gabriel</h3>
-          <p id="rsvpText">FAÇA PARTE DA NOSSA HISTÓRIA DE AMOR, CONFIRME SUA PRESENÇA.</p>
-          <div class="rsvp-modal__ornament" aria-hidden="true">&#10022;</div>
-          <p class="rsvp-modal__event">Casamento • 01 de Maio de 2027</p>
-        </div>
-
-        <div class="rsvp-modal__body">
-          <div class="modal__group purchase-flow rsvp-flow" id="rsvpFlow">
-            <label class="admin-label" for="rsvpGuestName">Nome completo do convidado *</label>
-            <input class="admin-input" id="rsvpGuestName" type="text" maxlength="60" placeholder="Ex: Gabriel Alves" autocomplete="name">
-
-            <div class="rsvp-flow__attendance" role="radiogroup" aria-labelledby="rsvpAttendanceLabel">
-              <span class="rsvp-flow__attendance-label" id="rsvpAttendanceLabel">Você irá ao evento? *</span>
-              <label class="rsvp-flow__option" for="rsvpAttendanceYes">
-                <input id="rsvpAttendanceYes" name="rsvpAttendance" type="radio" value="yes">
-                <span>Sim, com certeza estarei lá!</span>
-              </label>
-              <label class="rsvp-flow__option" for="rsvpAttendanceNo">
-                <input id="rsvpAttendanceNo" name="rsvpAttendance" type="radio" value="no">
-                <span>Infelizmente não poderei comparecer</span>
-              </label>
-            </div>
-
-            <p class="purchase-note">Sua confirmação nos ajuda muito no planejamento e organização do casamento.</p>
-            <p id="rsvpFeedback" class="modal__feedback"></p>
-
-            <div class="modal__actions">
-              <button class="btn btn--primary btn--block" id="submitRsvpBtn" type="button">Enviar confirmação</button>
-            </div>
-          </div>
-
-          <div class="purchase-success rsvp-success" id="rsvpSuccess" hidden>
-            <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
-            <h4 class="purchase-success__title">Resposta registrada com sucesso!</h4>
-            <p class="purchase-success__text" id="rsvpSuccessMessage"></p>
-            <p class="purchase-success__hint" id="rsvpSuccessHint">Agradecemos por nos informar. Até breve!</p>
-            <button class="btn btn--primary btn--block" id="rsvpSuccessCloseBtn" type="button">Registrar nova resposta</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Mural de Mensagens -->
-    <section class="section fade-in" id="mensagens" data-page="mensagens" aria-labelledby="mensagensTitle" hidden>
-      <div class="section-title-wrap">
-        <p class="section__eyebrow">Com carinho</p>
-        <h2 id="mensagensTitle">Mensagens aos Noivos</h2>
-      </div>
-
-      <article class="mensagens-intro">
-        <p class="mensagens-intro__text">
-          Obrigado por todo carinho. Será uma imensa alegria guardar suas palavras com muito amor neste momento tão especial das nossas vidas.
-        </p>
-      </article>
-
-      <section class="mensagens-form-card" aria-labelledby="mensagensFormTitle">
-        <h3 id="mensagensFormTitle" style="text-align: center; margin-bottom: 1.2rem;">Deixe seu recado</h3>
-
-        <div id="messageFormFlow">
-          <label class="admin-label" for="messageGuestName">Seu nome completo *</label>
-          <input class="admin-input" id="messageGuestName" type="text" maxlength="80" placeholder="Ex: Maria Silva" autocomplete="name">
-
-          <label class="admin-label" for="messageGuestEmail">E-mail (opcional)</label>
-          <input class="admin-input" id="messageGuestEmail" type="email" maxlength="120" placeholder="Ex: nome@email.com" autocomplete="email">
-
-          <label class="admin-label" for="messageText">Mensagem para os noivos *</label>
-          <textarea class="mensagens-textarea" id="messageText" maxlength="4000" placeholder="Escreva sua mensagem com carinho..."></textarea>
-          <p class="mensagens-char" id="messageCharCount">4000 caracteres restantes</p>
-
-          <p class="modal__feedback" id="messageFeedback"></p>
-          <button class="btn btn--primary btn--block" id="submitMessageBtn" type="button">Enviar mensagem</button>
-        </div>
-
-        <div class="purchase-success message-success" id="messageSuccess" hidden>
-          <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
-          <h4 class="purchase-success__title">Mensagem recebida com amor!</h4>
-          <p class="purchase-success__text" id="messageSuccessMessage"></p>
-          <p class="purchase-success__hint">Vamos guardar esse carinho com muito amor para lembrar desse dia especial.</p>
-          <button class="btn btn--primary btn--block" id="messageSuccessResetBtn" type="button">Escrever outra mensagem</button>
-        </div>
-      </section>
-
-      <!-- Mural Público de Mensagens Recebidas -->
-      <section class="mensagens-list" aria-labelledby="muralMensagensTitle" style="max-width: 680px; margin: 0 auto;">
-        <h3 id="muralMensagensTitle" style="text-align: center; margin-bottom: 1.2rem;">Recados dos Amigos e Familiares</h3>
-        <div class="mensagens-list__items" id="messagesList"></div>
-        <p class="empty-state" id="messagesEmptyState" style="text-align: center; color: var(--muted);" hidden>Seja o primeiro a deixar uma mensagem especial para os noivos!</p>
-      </section>
-    </section>
-
     <!-- Lista de Presentes -->
-    <section class="section fade-in" id="presentes" data-page="presentes" aria-labelledby="presentesTitle" hidden>
+    <section class="section fade-in" id="presentes" data-page="presentes" aria-labelledby="presentesTitle">
       <div class="section-title-wrap">
         <p class="section__eyebrow">Demonstre seu carinho</p>
         <h2 id="presentesTitle">Lista de Presentes</h2>
@@ -431,8 +326,59 @@
       </section>
     </section>
 
+    <!-- Confirmação de Presença (RSVP) -->
+    <section class="section fade-in" id="confirmacao" data-page="confirmacao" aria-labelledby="confirmacaoTitle">
+      <div class="section-title-wrap">
+        <p class="section__eyebrow">Sua presença é fundamental</p>
+        <h2 id="confirmacaoTitle">Confirmação de Presença</h2>
+      </div>
+
+      <div id="rsvpModal" class="rsvp-modal rsvp-inline">
+        <div class="rsvp-modal__hero">
+          <h3 id="rsvpTitle">Erica &amp; Gabriel</h3>
+          <p id="rsvpText">FAÇA PARTE DA NOSSA HISTÓRIA DE AMOR, CONFIRME SUA PRESENÇA.</p>
+          <div class="rsvp-modal__ornament" aria-hidden="true">&#10022;</div>
+          <p class="rsvp-modal__event">Celebre Conosco</p>
+        </div>
+
+        <div class="rsvp-modal__body">
+          <div class="modal__group purchase-flow rsvp-flow" id="rsvpFlow">
+            <label class="admin-label" for="rsvpGuestName">Nome completo do convidado *</label>
+            <input class="admin-input" id="rsvpGuestName" type="text" maxlength="60" placeholder="Ex: Gabriel Alves" autocomplete="name">
+
+            <div class="rsvp-flow__attendance" role="radiogroup" aria-labelledby="rsvpAttendanceLabel">
+              <span class="rsvp-flow__attendance-label" id="rsvpAttendanceLabel">Você irá ao evento? *</span>
+              <label class="rsvp-flow__option" for="rsvpAttendanceYes">
+                <input id="rsvpAttendanceYes" name="rsvpAttendance" type="radio" value="yes">
+                <span>Sim, com certeza estarei lá!</span>
+              </label>
+              <label class="rsvp-flow__option" for="rsvpAttendanceNo">
+                <input id="rsvpAttendanceNo" name="rsvpAttendance" type="radio" value="no">
+                <span>Infelizmente não poderei comparecer</span>
+              </label>
+            </div>
+
+            <p class="purchase-note">Sua confirmação nos ajuda muito no planejamento e organização do casamento.</p>
+            <p id="rsvpFeedback" class="modal__feedback"></p>
+
+            <div class="modal__actions">
+              <button class="btn btn--primary btn--block" id="submitRsvpBtn" type="button">Enviar confirmação</button>
+            </div>
+          </div>
+
+          <div class="purchase-success rsvp-success" id="rsvpSuccess" hidden>
+            <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
+            <h4 class="purchase-success__title">Resposta registrada com sucesso!</h4>
+            <p class="purchase-success__text" id="rsvpSuccessMessage"></p>
+            <p class="purchase-success__hint" id="rsvpSuccessHint">Agradecemos por nos informar. Até breve!</p>
+            <button class="btn btn--primary btn--block" id="rsvpSuccessCloseBtn" type="button">Registrar nova resposta</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Informações do Evento, Mapa & Dress Code -->
-    <section class="section fade-in" id="informacoes" data-page="informacoes" aria-labelledby="infoTitle" hidden>
+    <section class="section fade-in" id="informacoes" data-page="informacoes" aria-labelledby="infoTitle">
       <div class="section-title-wrap">
         <p class="section__eyebrow">Tudo sobre o grande dia</p>
         <h2 id="infoTitle">Informações do Casamento</h2>
@@ -444,7 +390,7 @@
         <article class="info-card">
           <h3>Cerimônia e Recepção</h3>
           <p style="font-weight: 600; margin-bottom: 0.3rem;" id="eventAddress">Casa Berlins - Chã do Pilar</p>
-          <p style="color: var(--accent-dark); font-weight: 700; margin-bottom: 1rem;" id="eventTime">Recepção 16h | Cerimônia 17h</p>
+          <p style="color: var(--accent-dark); font-weight: 700; margin-bottom: 1rem;" id="eventTime">CERIMÔNIA 16H</p>
           
           <div class="map-preview">
             <iframe
@@ -476,25 +422,13 @@
         <!-- Traje & Dress Code -->
         <article class="info-card info-card--traje">
           <h3>Dress Code • Traje</h3>
-          <p class="dress-code__intro">Inspirações e orientações para você estar elegante e confortável.</p>
           
           <img
             class="dress-code__image"
             src="assets/traje-inspiracao.png"
-            alt="Sugestões de trajes sociais para mulheres e homens"
+            alt="Sugestões de trajes para o casamento"
             loading="lazy"
             decoding="async">
-
-          <div class="dress-code__tips">
-            <div class="dress-code__tip-item">
-              <span class="dress-code__tip-icon">✨</span>
-              <p><strong>Para as mulheres:</strong> vestidos longos ou mídis fluidos são perfeitos para a ocasião.</p>
-            </div>
-            <div class="dress-code__tip-item">
-              <span class="dress-code__tip-icon">👔</span>
-              <p><strong>Para os homens:</strong> traje social com calça de alfaiataria, camisa, blazer ou terno e sapato social.</p>
-            </div>
-          </div>
           
           <div class="color-palette-guide">
             <h4 class="color-palette-guide__title">
@@ -541,17 +475,65 @@
         <div class="faq__item">
           <button class="faq__question" id="faqBtn1" aria-expanded="false" aria-controls="faq1" type="button">O local possui estacionamento?</button>
           <div class="faq__answer" id="faq1" role="region" aria-labelledby="faqBtn1" hidden>
-            O local não possui estacionamento privativo exclusivo, porém há facilidade para desembarque e estacionamento nas ruas próximas. Recomendamos transporte por aplicativo se possível.
+            O local não possui estacionamento privativo exclusivo, porém há facilidade para desembarque e estacionamento nas ruas próximas.
           </div>
         </div>
 
         <div class="faq__item">
           <button class="faq__question" id="faqBtn4" aria-expanded="false" aria-controls="faq4" type="button">A que horas começa a cerimônia?</button>
           <div class="faq__answer" id="faq4" role="region" aria-labelledby="faqBtn4" hidden>
-            A recepção aos convidados começa às 16h00 e o início da cerimônia pontualmente às 17h00. Venha com tempo para se acomodar com conforto!
+            A cerimônia começará pontualmente às 16h. Por gentileza chegar com 30min de antecedência para se acomodar com tranquilidade e aproveitar cada momento especial conosco!
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- Mural de Mensagens -->
+    <section class="section fade-in" id="mensagens" data-page="mensagens" aria-labelledby="mensagensTitle">
+      <div class="section-title-wrap">
+        <p class="section__eyebrow">Com carinho</p>
+        <h2 id="mensagensTitle">Mensagens aos Noivos</h2>
+      </div>
+
+      <article class="mensagens-intro">
+        <p class="mensagens-intro__text">
+          Obrigado por todo carinho. Será uma imensa alegria guardar suas palavras com muito amor neste momento tão especial das nossas vidas.
+        </p>
+      </article>
+
+      <section class="mensagens-form-card" aria-labelledby="mensagensFormTitle">
+        <h3 id="mensagensFormTitle" style="text-align: center; margin-bottom: 1.2rem;">Deixe seu recado</h3>
+
+        <div id="messageFormFlow">
+          <label class="admin-label" for="messageGuestName">Seu nome completo *</label>
+          <input class="admin-input" id="messageGuestName" type="text" maxlength="80" placeholder="Ex: Maria Silva" autocomplete="name">
+
+          <label class="admin-label" for="messageGuestEmail">E-mail (opcional)</label>
+          <input class="admin-input" id="messageGuestEmail" type="email" maxlength="120" placeholder="Ex: nome@email.com" autocomplete="email">
+
+          <label class="admin-label" for="messageText">Mensagem para os noivos *</label>
+          <textarea class="mensagens-textarea" id="messageText" maxlength="4000" placeholder="Escreva sua mensagem com carinho..."></textarea>
+          <p class="mensagens-char" id="messageCharCount">4000 caracteres restantes</p>
+
+          <p class="modal__feedback" id="messageFeedback"></p>
+          <button class="btn btn--primary btn--block" id="submitMessageBtn" type="button">Enviar mensagem</button>
+        </div>
+
+        <div class="purchase-success message-success" id="messageSuccess" hidden>
+          <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
+          <h4 class="purchase-success__title">Mensagem recebida com amor!</h4>
+          <p class="purchase-success__text" id="messageSuccessMessage"></p>
+          <p class="purchase-success__hint">Vamos guardar esse carinho com muito amor para lembrar desse dia especial.</p>
+          <button class="btn btn--primary btn--block" id="messageSuccessResetBtn" type="button">Escrever outra mensagem</button>
+        </div>
+      </section>
+
+      <!-- Mural Público de Mensagens Recebidas -->
+      <section class="mensagens-list" aria-labelledby="muralMensagensTitle" style="max-width: 680px; margin: 0 auto;">
+        <h3 id="muralMensagensTitle" style="text-align: center; margin-bottom: 1.2rem;">Recados dos Amigos e Familiares</h3>
+        <div class="mensagens-list__items" id="messagesList"></div>
+        <p class="empty-state" id="messagesEmptyState" style="text-align: center; color: var(--muted);" hidden>Seja o primeiro a deixar uma mensagem especial para os noivos!</p>
+      </section>
     </section>
 
     <!-- Área Administrativa dos Noivos -->

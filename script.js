@@ -9,7 +9,7 @@ const CONFIG = {
   weddingDate: "2027-05-01T16:00:00",
   city: "Chã do Pilar - AL",
   eventAddress: "Casa Berlins - Chã do Pilar",
-  eventTime: "Recepção 16h | Cerimônia 17h",
+  eventTime: "CERIMÔNIA 16H",
   // Troque por um PIN seu para proteger o reset administrativo.
   adminPin: "EG01052027",
   whatsappPhone: "5582991008045",
@@ -130,6 +130,7 @@ async function init() {
     bindEvents();
     startCountdown();
     setupRevealAnimations();
+    setupScrollSpy();
     checkMercadoPagoReturn();
   } catch (error) {
     handleInitError(error);
@@ -1467,9 +1468,9 @@ function showRsvpSuccess(guestName, attendanceChoice) {
   }
   if (el.rsvpSuccessMessage) {
     if (normalizedAttendance === "no") {
-      el.rsvpSuccessMessage.textContent = `${guestName}, recebemos sua resposta. Vamos sentir sua falta no dia ${weddingDate}.`;
+      el.rsvpSuccessMessage.textContent = `${guestName}, recebemos sua resposta. Vamos sentir sua falta!`;
     } else {
-      el.rsvpSuccessMessage.textContent = `${guestName}, muito obrigado por confirmar sua presença. Esperamos você no dia ${weddingDate}.`;
+      el.rsvpSuccessMessage.textContent = `${guestName}, muito obrigado por confirmar sua presença. Esperamos você com muito carinho!`;
     }
   }
   if (el.rsvpSuccessHint) {
@@ -2521,12 +2522,23 @@ function showPage(pageId, options = {}) {
     setGiftMenuExpanded(false);
   }
 
+  // Se for a página administrativa, controlamos a visibilidade
+  const adminView = document.getElementById("administrativo");
+  if (adminView) {
+    adminView.hidden = nextPage !== "administrativo";
+    if (nextPage === "administrativo") {
+      adminView.classList.add("is-visible");
+    }
+  }
+
+  // Todas as seções públicas permanecem visíveis para rolagem contínua na mesma página
   (el.pageViews || []).forEach((view) => {
     const viewPage = String(view.dataset.page || "").trim().toLowerCase();
-    const isActive = viewPage === nextPage;
-    view.hidden = !isActive;
-    if (isActive && view.classList.contains("fade-in")) {
-      view.classList.add("is-visible");
+    if (viewPage !== "administrativo") {
+      view.hidden = false;
+      if (view.classList.contains("fade-in")) {
+        view.classList.add("is-visible");
+      }
     }
   });
 
@@ -2541,9 +2553,43 @@ function showPage(pageId, options = {}) {
     }
   }
 
-  if (options.resetScroll !== false) {
-    window.scrollTo({ top: 0, behavior: "auto" });
+  if (options.resetScroll) {
+    if (nextPage === "inicio") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const targetEl = document.getElementById(nextPage) || document.getElementById(`${nextPage}-conteudo`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   }
+}
+
+function setupScrollSpy() {
+  const sectionIds = ["inicio", "presentes", "confirmacao", "informacoes", "mensagens"];
+  const sections = sectionIds
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  if (typeof window.IntersectionObserver !== "function") return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting);
+      if (visible.length > 0) {
+        visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const activeId = visible[0].target.id;
+        state.activePage = activeId;
+        setActiveBottomNav(`#${activeId}`);
+      }
+    },
+    {
+      rootMargin: "-15% 0px -40% 0px",
+      threshold: [0.1, 0.3, 0.6],
+    }
+  );
+
+  sections.forEach((sec) => observer.observe(sec));
 }
 
 function itemStatusHelperMarkup(item) {
