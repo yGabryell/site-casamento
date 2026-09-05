@@ -103,6 +103,7 @@ exports.handler = async (event, context) => {
       ],
       payer: {
         name: String(guestName || "Convidado").slice(0, 50),
+        email: "convidado@casamentoericaegabriel.com.br",
       },
       back_urls: {
         success: `${SITE_URL}/?status=approved&item_id=${encodeURIComponent(itemId || "")}&guest=${encodeURIComponent(guestName || "")}#presentes`,
@@ -112,6 +113,7 @@ exports.handler = async (event, context) => {
       auto_return: "approved",
       statement_descriptor: "CASAMENTO E&G",
       external_reference: externalRef,
+      notification_url: `${SITE_URL}/api/mercadopago-webhook`,
       payment_methods: paymentMethodsConfig,
     };
 

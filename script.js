@@ -238,6 +238,12 @@ function cacheElements() {
   el.modalText = document.getElementById("modalText");
   el.purchaseGuestName = document.getElementById("purchaseGuestName");
   el.purchaseFlow = document.getElementById("purchaseFlow");
+  el.purchasePixView = document.getElementById("purchasePixView");
+  el.pixQrCodeImg = document.getElementById("pixQrCodeImg");
+  el.pixAmountText = document.getElementById("pixAmountText");
+  el.copyPixCodeBtn = document.getElementById("copyPixCodeBtn");
+  el.copyPixCodeBtnText = document.getElementById("copyPixCodeBtnText");
+  el.cancelPixBtn = document.getElementById("cancelPixBtn");
   el.purchaseFeedback = document.getElementById("purchaseFeedback");
   el.externalLink = document.getElementById("externalLink");
   el.submitReceiptBtn = document.getElementById("submitReceiptBtn");
@@ -1324,13 +1330,26 @@ function bindGiftEvents() {
 
 function bindPurchaseEvents() {
   if (el.mpPixBtn) {
-    el.mpPixBtn.addEventListener("click", () => handleMercadoPagoCheckout("pix"));
+    el.mpPixBtn.addEventListener("click", handleDirectPixCheckout);
   }
 
   if (el.mpCardBtn) {
     el.mpCardBtn.addEventListener("click", () => handleMercadoPagoCheckout("credit_card"));
   } else if (el.mpPayBtn) {
     el.mpPayBtn.addEventListener("click", () => handleMercadoPagoCheckout("credit_card"));
+  }
+
+  if (el.copyPixCodeBtn) {
+    el.copyPixCodeBtn.addEventListener("click", copyCurrentPixCode);
+  }
+
+  if (el.cancelPixBtn) {
+    el.cancelPixBtn.addEventListener("click", () => {
+      stopPixPolling();
+      if (el.purchasePixView) el.purchasePixView.hidden = true;
+      if (el.purchaseFlow) el.purchaseFlow.hidden = false;
+      setPurchaseFeedback("");
+    });
   }
 
   if (el.submitReceiptBtn) {
@@ -1772,6 +1791,10 @@ function closePurchaseModal() {
 }
 
 function resetPurchaseForm(clearName, showFlow) {
+  stopPixPolling();
+  if (el.purchasePixView) {
+    el.purchasePixView.hidden = true;
+  }
   const shouldShowFlow = Boolean(showFlow);
   state.purchaseSubmitBusy = false;
   updatePurchaseSubmitState();
@@ -1888,6 +1911,190 @@ function setPurchaseFeedback(message, isError) {
   if (!el.purchaseFeedback) return;
   el.purchaseFeedback.textContent = message || "";
   el.purchaseFeedback.dataset.state = isError ? "error" : "info";
+}
+
+let pixPollingTimer = null;
+let currentPixCode = "";
+
+function stopPixPolling() {
+  if (pixPollingTimer) {
+    clearInterval(pixPollingTimer);
+    pixPollingTimer = null;
+  }
+}
+
+async function handleDirectPixCheckout() {
+  const item = state.items.find((entry) => entry.id === state.activePurchaseItemId);
+  if (!item) {
+    setPurchaseFeedback("Não foi possível localizar o item selecionado.", true);
+    return;
+  }
+
+  if (item.status === "pending" || item.status === "purchased") {
+    setPurchaseFeedback("Este item não está mais disponível para confirmação.", true);
+    renderGiftList();
+    return;
+  }
+
+  const guestName = (el.purchaseGuestName ? el.purchaseGuestName.value : "").trim() || readStoredGuestName();
+  if (!guestName) {
+    setPurchaseFeedback("Por favor, digite seu nome acima para identificar o presente.", true);
+    if (el.purchaseGuestName) {
+      el.purchaseGuestName.focus();
+    }
+    return;
+  }
+
+  persistGuestNameValue(guestName);
+  setMpPayLoading(true, "pix");
+  setPurchaseFeedback("");
+
+  try {
+    const endpoint = window.location.hostname.includes("netlify")
+      ? "/.netlify/functions/create-pix"
+      : "/api/create-pix";
+
+    let response;
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId: item.id,
+          itemName: item.nome,
+          itemPrice: item.preco,
+          guestName,
+        }),
+      });
+      if (response.status === 404) {
+        const fallback = endpoint.startsWith("/api")
+          ? "/.netlify/functions/create-pix"
+          : "/api/create-pix";
+        response = await fetch(fallback, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            itemId: item.id,
+            itemName: item.nome,
+            itemPrice: item.preco,
+            guestName,
+          }),
+        });
+      }
+    } catch (_) {
+      const fallback = endpoint.startsWith("/api")
+        ? "/.netlify/functions/create-pix"
+        : "/api/create-pix";
+      response = await fetch(fallback, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId: item.id,
+          itemName: item.nome,
+          itemPrice: item.preco,
+          guestName,
+        }),
+      });
+    }
+
+    const data = await response.json();
+
+    if (!response.ok || !data.qrCode) {
+      throw new Error(data.message || "Não foi possível gerar a chave Pix. Tente novamente.");
+    }
+
+    currentPixCode = data.qrCode;
+
+    // Atualiza imagem do QR Code
+    if (el.pixQrCodeImg) {
+      el.pixQrCodeImg.src = data.qrCodeBase64
+        ? `data:image/png;base64,${data.qrCodeBase64}`
+        : `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.qrCode)}`;
+    }
+    if (el.pixAmountText) {
+      el.pixAmountText.textContent = formatCurrency(data.amount || item.preco);
+    }
+    if (el.copyPixCodeBtnText) {
+      el.copyPixCodeBtnText.textContent = "Copiar Código Pix (Copia e Cola)";
+    }
+
+    // Exibe a tela do Pix e oculta o formulário anterior
+    if (el.purchaseFlow) el.purchaseFlow.hidden = true;
+    if (el.purchasePixView) el.purchasePixView.hidden = false;
+
+    // Inicia verificação automática em segundo plano
+    startPixPolling(data.paymentId, item, guestName);
+  } catch (err) {
+    console.error("Erro ao criar Pix direto:", err);
+    setPurchaseFeedback(err.message || "Erro de conexão ao gerar o Pix. Tente novamente.", true);
+  } finally {
+    setMpPayLoading(false);
+  }
+}
+
+async function copyCurrentPixCode() {
+  if (!currentPixCode) return;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(currentPixCode);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = currentPixCode;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    if (el.copyPixCodeBtnText) {
+      el.copyPixCodeBtnText.textContent = "✅ Código Pix Copiado!";
+      setTimeout(() => {
+        if (el.copyPixCodeBtnText) {
+          el.copyPixCodeBtnText.textContent = "Copiar Código Pix (Copia e Cola)";
+        }
+      }, 4000);
+    }
+    showToast("Código Pix copiado! Abra o aplicativo do seu banco e cole na opção Pix Copia e Cola.");
+  } catch (_) {
+    showToast("Não foi possível copiar automaticamente. Selecione e copie o código.");
+  }
+}
+
+function startPixPolling(paymentId, item, guestName) {
+  stopPixPolling();
+  if (!paymentId) return;
+
+  const endpoint = window.location.hostname.includes("netlify")
+    ? `/.netlify/functions/check-pix-status?paymentId=${paymentId}`
+    : `/api/check-pix-status?paymentId=${paymentId}`;
+
+  pixPollingTimer = setInterval(async () => {
+    try {
+      const res = await fetch(endpoint);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.approved) {
+          stopPixPolling();
+
+          // Atualiza status do item local e remoto
+          item.status = "purchased";
+          item.reservedBy = guestName;
+          persistItemStatuses();
+          await hydrateItems();
+          renderGiftList();
+
+          // Mostra tela de sucesso
+          if (el.purchasePixView) el.purchasePixView.hidden = true;
+          showPurchaseSuccess(item.nome, guestName);
+          showToast(`🎉 Pagamento Pix aprovado! Muito obrigado pelo carinho, ${guestName}!`);
+        }
+      }
+    } catch (_) {
+      // Continua tentando
+    }
+  }, 2500);
+
+  // Cancela polling automático após 10 minutos
+  setTimeout(stopPixPolling, 600000);
 }
 
 async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {

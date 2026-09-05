@@ -6,6 +6,14 @@
       "destination": "/api/create-preference"
     },
     {
+      "source": "/.netlify/functions/create-pix",
+      "destination": "/api/create-pix"
+    },
+    {
+      "source": "/.netlify/functions/check-pix-status",
+      "destination": "/api/check-pix-status"
+    },
+    {
       "source": "/.netlify/functions/confirm-purchase",
       "destination": "/api/confirm-purchase"
     },

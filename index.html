@@ -313,11 +313,38 @@
           </div>
         </div>
 
+        <!-- Tela de Pagamento Pix Direto no Site (sem sair da página e sem exigir e-mail) -->
+        <div class="modal__group purchase-pix-view" id="purchasePixView" hidden style="text-align: center;">
+          <h4 style="margin-bottom: 0.4rem; color: var(--accent-dark);">Pagamento via Pix</h4>
+          <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">Abra o app do seu banco e escaneie o QR Code ou copie o código Pix abaixo:</p>
+
+          <div style="background: #ffffff; padding: 1rem; border-radius: 14px; display: inline-block; border: 1px solid var(--line); margin-bottom: 1rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+            <img id="pixQrCodeImg" src="" alt="QR Code Pix" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+          </div>
+
+          <div style="margin-bottom: 1.2rem;">
+            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem;">Valor do presente:</p>
+            <strong id="pixAmountText" style="font-size: 1.5rem; color: var(--accent-dark); display: block;">R$ 0,00</strong>
+          </div>
+
+          <button class="btn btn--primary btn--block" id="copyPixCodeBtn" type="button" style="margin-bottom: 0.8rem; font-weight: 600;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copyPixCodeBtnText">Copiar Código Pix (Copia e Cola)</span>
+          </button>
+
+          <div id="pixStatusIndicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--accent-dark); font-size: 0.88rem; margin: 1rem 0; font-weight: 500;">
+            <span class="btn-spinner" style="border-color: var(--accent-dark); border-top-color: transparent;"></span>
+            <span>Aguardando confirmação do pagamento...</span>
+          </div>
+
+          <button class="btn btn--ghost btn--block" id="cancelPixBtn" type="button" style="font-size: 0.88rem;">Voltar para opções</button>
+        </div>
+
         <div class="purchase-success" id="purchaseSuccess" hidden>
           <div class="purchase-success__icon" aria-hidden="true">&#10003;</div>
           <h4 class="purchase-success__title">Muito obrigado pelo carinho!</h4>
           <p class="purchase-success__text" id="purchaseSuccessMessage"></p>
-          <p class="purchase-success__hint">Seu presente ficará como aguardando confirmação até a validação dos noivos.</p>
+          <p class="purchase-success__hint">Seu presente foi confirmado com sucesso e a mensagem enviada aos noivos!</p>
           <button class="btn btn--primary btn--block" id="purchaseSuccessCloseBtn" type="button">Registrar outro presente</button>
         </div>
       </section>

@@ -87,6 +87,7 @@ module.exports = async (req, res) => {
       ],
       payer: {
         name: String(guestName || "Convidado").slice(0, 50),
+        email: "convidado@casamentoericaegabriel.com.br",
       },
       back_urls: {
         success: `${SITE_URL}/?status=approved&item_id=${encodeURIComponent(itemId || "")}&guest=${encodeURIComponent(guestName || "")}#presentes`,
