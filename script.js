@@ -2123,20 +2123,12 @@ async function unlockAdminPanel() {
   const upperInput = rawInput.toUpperCase();
   const configuredPin = String(CONFIG.adminPin || "").trim().toUpperCase();
 
-  // Candidatos a PIN para permitir digitar tanto 01052027 quanto EG01052027
+  // Candidatos derivados exclusivamente do que o usuário digitou (com ou sem prefixo EG)
   const candidates = [upperInput];
   if (upperInput.startsWith("EG")) {
     candidates.push(upperInput.slice(2));
   } else {
     candidates.push(`EG${upperInput}`);
-  }
-
-  // Adicionar variações conhecidas da data do casamento
-  if (upperInput.includes("01052027") || upperInput.includes("21112026")) {
-    candidates.push("EG01052027", "01052027", "EG21112026", "21112026");
-  }
-  if (configuredPin) {
-    candidates.push(configuredPin);
   }
 
   const uniqueCandidates = Array.from(new Set(candidates));
@@ -2157,17 +2149,32 @@ async function unlockAdminPanel() {
       }
 
       if (!verifiedPin) {
-        el.adminFeedback.textContent = "PIN inválido. Use 01052027 ou EG01052027.";
-        showToast("PIN inválido");
+        setAdminUnlocked(false);
+        el.adminFeedback.textContent = "PIN incorreto. Tente novamente.";
+        showToast("PIN incorreto");
+        if (el.adminPinInput) {
+          el.adminPinInput.focus();
+          el.adminPinInput.select();
+        }
         return;
       }
       state.adminSessionPin = verifiedPin;
     } else {
-      const allowedPins = [configuredPin, "EG01052027", "01052027", "EG21112026", "21112026"].filter(Boolean);
+      const allowedPins = [configuredPin];
+      if (configuredPin.startsWith("EG")) {
+        allowedPins.push(configuredPin.slice(2));
+      } else {
+        allowedPins.push(`EG${configuredPin}`);
+      }
       const match = uniqueCandidates.find((cand) => allowedPins.includes(cand));
       if (!match) {
-        el.adminFeedback.textContent = "PIN inválido. Use 01052027 ou EG01052027.";
-        showToast("PIN inválido");
+        setAdminUnlocked(false);
+        el.adminFeedback.textContent = "PIN incorreto. Tente novamente.";
+        showToast("PIN incorreto");
+        if (el.adminPinInput) {
+          el.adminPinInput.focus();
+          el.adminPinInput.select();
+        }
         return;
       }
       state.adminSessionPin = match;
