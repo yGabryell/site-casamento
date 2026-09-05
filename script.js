@@ -301,7 +301,9 @@ function applyConfigToPage() {
     el.menuOverlayBrand.textContent = brandLabel;
   }
   el.heroDate.textContent = formatEventDate(CONFIG.weddingDate);
-  el.heroCity.textContent = CONFIG.city;
+  if (el.heroCity) {
+    el.heroCity.textContent = CONFIG.city;
+  }
   el.eventAddress.textContent = CONFIG.eventAddress;
   el.eventTime.textContent = CONFIG.eventTime;
   const mapsHref = CONFIG.defaultLinks.maps;
