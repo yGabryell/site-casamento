@@ -1920,21 +1920,52 @@ async function handleMercadoPagoCheckout(paymentMethod = "credit_card") {
   setMpPayLoading(true, paymentMethod);
   setPurchaseFeedback("");
 
-  try {
-    const response = await fetch("/.netlify/functions/create-preference", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        itemId: item.id,
-        itemName: item.nome,
-        itemPrice: item.preco,
-        itemImage: item.imagem,
-        guestName,
-        paymentMethod,
-      }),
-    });
+    const preferencePayload = {
+      itemId: item.id,
+      itemName: item.nome,
+      itemPrice: item.preco,
+      itemImage: item.imagem,
+      guestName,
+      paymentMethod,
+    };
+
+    const primaryEndpoint = window.location.hostname.includes("netlify")
+      ? "/.netlify/functions/create-preference"
+      : "/api/create-preference";
+
+    let response;
+    try {
+      response = await fetch(primaryEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferencePayload),
+      });
+      if (response.status === 404) {
+        const fallbackEndpoint = primaryEndpoint.startsWith("/api")
+          ? "/.netlify/functions/create-preference"
+          : "/api/create-preference";
+        response = await fetch(fallbackEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(preferencePayload),
+        });
+      }
+    } catch (fetchErr) {
+      const fallbackEndpoint = primaryEndpoint.startsWith("/api")
+        ? "/.netlify/functions/create-preference"
+        : "/api/create-preference";
+      response = await fetch(fallbackEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferencePayload),
+      });
+    }
 
     const data = await response.json();
 
