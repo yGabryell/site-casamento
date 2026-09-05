@@ -1,0 +1,53 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Gradiente dourado da aliança -->
+    <linearGradient id="ringGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082" />
+      <stop offset="35%" stop-color="#FFCA28" />
+      <stop offset="70%" stop-color="#FFB300" />
+      <stop offset="100%" stop-color="#FF8F00" />
+    </linearGradient>
+
+    <!-- Gradiente da pedra rosa / diamante -->
+    <linearGradient id="diamondPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF80AB" />
+      <stop offset="50%" stop-color="#FF4081" />
+      <stop offset="100%" stop-color="#E91E63" />
+    </linearGradient>
+
+    <!-- Sombra sutil para profundidade -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softGlow)">
+    <!-- Aro da aliança dourada -->
+    <circle cx="32" cy="35" r="20" fill="none" stroke="url(#ringGold)" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Brilho no aro -->
+    <path d="M 18 45 A 20 20 0 0 1 14 31" fill="none" stroke="#FFF9C4" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+
+    <!-- Garras / engaste do diamante -->
+    <path d="M 23 18 L 32 23 L 41 18 L 37 14 L 27 14 Z" fill="#FFA000"/>
+
+    <!-- Diamante Rosa no topo (estilo casar.com) -->
+    <g transform="translate(32, 13)">
+      <!-- Corpo lapidado do diamante -->
+      <polygon points="0,-9 9,-2 5.5,8 -5.5,8 -9,-2" fill="url(#diamondPink)" stroke="#C2185B" stroke-width="0.8"/>
+      <!-- Facetas do diamante -->
+      <polygon points="0,-9 -9,-2 -3.5,-2" fill="#FF80AB"/>
+      <polygon points="0,-9 9,-2 3.5,-2" fill="#F06292"/>
+      <polygon points="0,-9 -3.5,-2 3.5,-2" fill="#FFFFFF" opacity="0.85"/>
+      <polygon points="-3.5,-2 0,8 -5.5,8 -9,-2" fill="#E91E63"/>
+      <polygon points="3.5,-2 0,8 5.5,8 9,-2" fill="#C2185B"/>
+      <polygon points="-3.5,-2 3.5,-2 0,8" fill="#FF4081"/>
+      <!-- Ponto de brilho / luz -->
+      <circle cx="-1" cy="-4" r="1.5" fill="#FFFFFF" opacity="0.95"/>
+    </g>
+
+    <!-- Pequeno ponto de brilho rosa lateral característico -->
+    <circle cx="50" cy="33" r="3" fill="#FF4081"/>
+    <circle cx="50" cy="33" r="1.2" fill="#FFFFFF"/>
+  </g>
+</svg>
