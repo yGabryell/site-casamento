@@ -12,7 +12,7 @@ const CONFIG = {
   eventTime: "CERIMÔNIA 16H",
   // Troque por um PIN seu para proteger o reset administrativo.
   adminPin: "EG01052027",
-  whatsappPhone: "5582991008045",
+  whatsappPhone: "5582996013473",
   contactEmail: "gabriell.alvess399@gmail.com",
   pixKey: "5582991008045",
   pixTitular: "Erica & Gabriel",
