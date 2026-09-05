@@ -1928,7 +1928,18 @@ img {
   margin: 0;
 }
 
-/* RSVP */
+/* RSVP - Tela Dedicada */
+.rsvp-page {
+  min-height: 80vh;
+  padding-top: calc(var(--header-height) + 2rem);
+  padding-bottom: 5rem;
+}
+
+.rsvp-back-bar {
+  max-width: 620px;
+  margin: 0 auto 1.5rem auto;
+}
+
 .rsvp-modal {
   background: var(--surface);
   border: 1px solid var(--line);

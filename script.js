@@ -3075,21 +3075,24 @@ function showPage(pageId, options = {}) {
     setGiftMenuExpanded(false);
   }
 
-  // Se for a página administrativa, controlamos a visibilidade
-  const adminView = document.getElementById("administrativo");
-  if (adminView) {
-    adminView.hidden = nextPage !== "administrativo";
-    if (nextPage === "administrativo") {
-      adminView.classList.add("is-visible");
-    }
-  }
+  // Telas dedicadas (fora da rolagem contínua principal)
+  const isDedicatedPage = nextPage === "confirmacao" || nextPage === "administrativo";
 
-  // Todas as seções públicas permanecem visíveis para rolagem contínua na mesma página
+  // Controla visibilidade das seções
   (el.pageViews || []).forEach((view) => {
     const viewPage = String(view.dataset.page || "").trim().toLowerCase();
-    if (viewPage !== "administrativo") {
-      view.hidden = false;
-      if (view.classList.contains("fade-in")) {
+    if (isDedicatedPage) {
+      // Em tela dedicada, exibe apenas a seção solicitada
+      const isTarget = viewPage === nextPage;
+      view.hidden = !isTarget;
+      if (isTarget && view.classList.contains("fade-in")) {
+        view.classList.add("is-visible");
+      }
+    } else {
+      // Na rolagem principal, exibe todas as seções públicas e oculta as telas dedicadas
+      const isDedicatedView = viewPage === "confirmacao" || viewPage === "administrativo";
+      view.hidden = isDedicatedView;
+      if (!isDedicatedView && view.classList.contains("fade-in")) {
         view.classList.add("is-visible");
       }
     }
@@ -3097,6 +3100,10 @@ function showPage(pageId, options = {}) {
 
   setActiveBottomNav(nextHash);
   renderGiftCategoryUI();
+
+  if (nextPage === "confirmacao" && el.rsvpGuestName) {
+    window.setTimeout(() => el.rsvpGuestName.focus(), 220);
+  }
 
   if (options.updateHash && window.location.hash !== nextHash) {
     if (options.replaceHash && window.history && typeof window.history.replaceState === "function") {
@@ -3107,7 +3114,7 @@ function showPage(pageId, options = {}) {
   }
 
   if (options.resetScroll) {
-    if (nextPage === "inicio") {
+    if (isDedicatedPage || nextPage === "inicio") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       const targetEl = document.getElementById(nextPage) || document.getElementById(`${nextPage}-conteudo`);
@@ -3119,7 +3126,7 @@ function showPage(pageId, options = {}) {
 }
 
 function setupScrollSpy() {
-  const sectionIds = ["inicio", "presentes", "confirmacao", "informacoes", "mensagens"];
+  const sectionIds = ["inicio", "informacoes", "presentes", "mensagens"];
   const sections = sectionIds
     .map((id) => document.getElementById(id))
     .filter(Boolean);
@@ -3128,6 +3135,9 @@ function setupScrollSpy() {
 
   const observer = new IntersectionObserver(
     (entries) => {
+      // Não altera a barra de navegação se o usuário estiver em uma tela dedicada
+      if (state.activePage === "confirmacao" || state.activePage === "administrativo") return;
+
       const visible = entries.filter((entry) => entry.isIntersecting);
       if (visible.length > 0) {
         visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
